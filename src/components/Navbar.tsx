@@ -1,9 +1,10 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
-import { Menu, X, Bell, Heart, BookOpen, Home, LogIn, LogOut, User } from "lucide-react";
+import { Menu, X, Bell, Heart, BookOpen, Home, LogIn, LogOut, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { toast } from "sonner";
 
 const navItems = [
@@ -17,6 +18,7 @@ const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const { user, signOut } = useAuth();
+  const { isAdmin } = useIsAdmin();
 
   const handleSignOut = async () => {
     await signOut();
@@ -49,6 +51,13 @@ const Navbar = () => {
               </Link>
             );
           })}
+          {isAdmin && (
+            <Link to="/admin">
+              <Button variant={location.pathname === "/admin" ? "default" : "ghost"} size="sm" className="gap-2">
+                <Shield className="h-4 w-4" /> Admin
+              </Button>
+            </Link>
+          )}
           {user ? (
             <Button variant="ghost" size="sm" className="ml-2 gap-2" onClick={handleSignOut}>
               <LogOut className="h-4 w-4" /> Sign Out
@@ -90,6 +99,13 @@ const Navbar = () => {
                   </Link>
                 );
               })}
+              {isAdmin && (
+                <Link to="/admin" onClick={() => setMobileOpen(false)}>
+                  <Button variant={location.pathname === "/admin" ? "default" : "ghost"} className="w-full justify-start gap-3">
+                    <Shield className="h-4 w-4" /> Admin
+                  </Button>
+                </Link>
+              )}
               {user ? (
                 <Button variant="ghost" className="w-full justify-start gap-3" onClick={() => { handleSignOut(); setMobileOpen(false); }}>
                   <LogOut className="h-4 w-4" /> Sign Out
