@@ -1,11 +1,13 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
-import { Menu, X, Bell, Heart, BookOpen, Home, LogIn, LogOut, Shield } from "lucide-react";
+import { Menu, X, Bell, Heart, BookOpen, Home, LogIn, LogOut, Shield, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useTheme } from "next-themes";
 import { toast } from "sonner";
+import logo from "@/assets/logo.png";
 
 const navItems = [
   { path: "/", label: "Home", icon: Home },
@@ -19,19 +21,20 @@ const Navbar = () => {
   const location = useLocation();
   const { user, signOut } = useAuth();
   const { isAdmin } = useIsAdmin();
+  const { theme, setTheme } = useTheme();
 
   const handleSignOut = async () => {
     await signOut();
     toast.success("Signed out");
   };
 
+  const toggleTheme = () => setTheme(theme === "dark" ? "light" : "dark");
+
   return (
     <nav className="sticky top-0 z-50 border-b bg-card/80 backdrop-blur-lg">
       <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
-            <span className="font-display text-lg font-bold text-primary-foreground">U</span>
-          </div>
+          <img src={logo} alt="UmmahLink Uganda" className="h-10 w-10 rounded-lg" />
           <span className="font-display text-xl font-bold text-foreground">
             Ummah<span className="text-gradient-gold">Link</span>
           </span>
@@ -58,13 +61,16 @@ const Navbar = () => {
               </Button>
             </Link>
           )}
+          <Button variant="ghost" size="icon" onClick={toggleTheme} className="ml-1">
+            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </Button>
           {user ? (
-            <Button variant="ghost" size="sm" className="ml-2 gap-2" onClick={handleSignOut}>
+            <Button variant="ghost" size="sm" className="gap-2" onClick={handleSignOut}>
               <LogOut className="h-4 w-4" /> Sign Out
             </Button>
           ) : (
             <Link to="/auth">
-              <Button variant="gold" size="sm" className="ml-2 gap-2">
+              <Button variant="gold" size="sm" className="gap-2">
                 <LogIn className="h-4 w-4" /> Sign In
               </Button>
             </Link>
@@ -72,9 +78,14 @@ const Navbar = () => {
         </div>
 
         {/* Mobile toggle */}
-        <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
-          {mobileOpen ? <X /> : <Menu />}
-        </Button>
+        <div className="flex items-center gap-1 md:hidden">
+          <Button variant="ghost" size="icon" onClick={toggleTheme}>
+            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => setMobileOpen(!mobileOpen)}>
+            {mobileOpen ? <X /> : <Menu />}
+          </Button>
+        </div>
       </div>
 
       {/* Mobile menu */}

@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { LogIn, UserPlus } from "lucide-react";
+import logo from "@/assets/logo.png";
 
 const AuthPage = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -42,9 +43,7 @@ const AuthPage = () => {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
         <Card>
           <CardHeader className="text-center">
-            <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
-              <span className="font-display text-xl font-bold text-primary-foreground">U</span>
-            </div>
+            <img src={logo} alt="UmmahLink Uganda" className="mx-auto mb-2 h-14 w-14 rounded-xl" />
             <CardTitle className="font-display text-2xl">{isSignUp ? "Join UmmahLink" : "Welcome Back"}</CardTitle>
             <CardDescription>
               {isSignUp ? "Create an account to post alerts and donate" : "Sign in to your account"}
