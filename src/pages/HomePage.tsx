@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Bell, Heart, BookOpen, ArrowRight, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import logo from "@/assets/logo.png";
 
 const features = [
   {
@@ -45,6 +46,7 @@ const HomePage = () => {
             transition={{ duration: 0.6 }}
             className="mx-auto max-w-2xl text-center"
           >
+            <img src={logo} alt="UmmahLink Uganda" className="mx-auto mb-6 h-24 w-24 rounded-2xl shadow-lg" />
             <h1 className="font-display text-4xl font-bold tracking-tight text-primary-foreground md:text-6xl">
               Strengthening the{" "}
               <span className="text-gradient-gold">Ummah</span> in Uganda
@@ -69,7 +71,7 @@ const HomePage = () => {
         {/* Decorative wave */}
         <div className="absolute bottom-0 left-0 right-0">
           <svg viewBox="0 0 1440 60" fill="none" className="w-full">
-            <path d="M0 60V30C360 0 720 60 1080 30C1260 15 1380 15 1440 20V60H0Z" fill="hsl(140 20% 98%)" />
+            <path d="M0 60V30C360 0 720 60 1080 30C1260 15 1380 15 1440 20V60H0Z" className="fill-background" />
           </svg>
         </div>
       </section>
