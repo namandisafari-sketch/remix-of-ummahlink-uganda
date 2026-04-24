@@ -39,29 +39,29 @@ const HomePage = () => {
     <div className="flex flex-col">
       {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-emerald geometric-pattern">
-        <div className="relative z-10 px-5 py-12">
+        <div className="relative z-10 px-5 py-12 md:py-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-center"
+            className="mx-auto max-w-2xl text-center"
           >
-            <img src={logo} alt="UmmahLink Uganda" className="mx-auto mb-4 h-20 w-20 rounded-2xl bg-card/10 p-2 shadow-lg" />
-            <h1 className="font-display text-3xl font-bold tracking-tight text-primary-foreground">
+            <img src={logo} alt="UmmahLink Uganda" className="mx-auto mb-4 h-20 w-20 rounded-2xl bg-card/10 p-2 shadow-lg md:h-24 md:w-24" />
+            <h1 className="font-display text-3xl font-bold tracking-tight text-primary-foreground md:text-5xl">
               Strengthening the{" "}
               <span className="text-gradient-gold">Ummah</span> in Uganda
             </h1>
-            <p className="mt-3 text-sm text-primary-foreground/80">
+            <p className="mt-3 text-sm text-primary-foreground/80 md:text-base">
               Real-time alerts, transparent giving, and shared Islamic knowledge.
             </p>
-            <div className="mt-6 flex flex-col gap-2">
-              <Link to="/alerts">
-                <Button variant="gold" size="lg" className="w-full gap-2">
+            <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
+              <Link to="/alerts" className="sm:w-auto">
+                <Button variant="gold" size="lg" className="w-full gap-2 sm:w-auto">
                   <Bell className="h-4 w-4" /> View Alerts
                 </Button>
               </Link>
-              <Link to="/donations">
-                <Button size="lg" className="w-full gap-2 border border-primary-foreground/20 bg-transparent text-primary-foreground hover:bg-primary-foreground/10">
+              <Link to="/donations" className="sm:w-auto">
+                <Button size="lg" className="w-full gap-2 border border-primary-foreground/20 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 sm:w-auto">
                   <Heart className="h-4 w-4" /> Donate Now
                 </Button>
               </Link>
@@ -76,24 +76,24 @@ const HomePage = () => {
       </section>
 
       {/* Stats */}
-      <section className="-mt-2 px-4 pb-6">
-        <div className="grid grid-cols-3 gap-2 rounded-xl border bg-card p-4 shadow-emerald">
+      <section className="-mt-2 px-4 pb-6 md:px-6">
+        <div className="mx-auto grid max-w-3xl grid-cols-3 gap-2 rounded-xl border bg-card p-4 shadow-emerald md:gap-4 md:p-6">
           {stats.map((stat) => (
             <div key={stat.label} className="text-center">
-              <p className="font-display text-lg font-bold text-primary">{stat.value}</p>
-              <p className="text-[10px] leading-tight text-muted-foreground">{stat.label}</p>
+              <p className="font-display text-lg font-bold text-primary md:text-2xl">{stat.value}</p>
+              <p className="text-[10px] leading-tight text-muted-foreground md:text-sm">{stat.label}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* Features */}
-      <section className="px-4 pb-8">
+      <section className="px-4 pb-8 md:px-6">
         <div className="mb-4 text-center">
-          <h2 className="font-display text-2xl font-bold text-foreground">How We Serve</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Three pillars connecting our community</p>
+          <h2 className="font-display text-2xl font-bold text-foreground md:text-3xl">How We Serve</h2>
+          <p className="mt-1 text-sm text-muted-foreground md:text-base">Three pillars connecting our community</p>
         </div>
-        <div className="flex flex-col gap-3">
+        <div className="mx-auto flex max-w-5xl flex-col gap-3 md:grid md:grid-cols-3">
           {features.map((feature, i) => {
             const Icon = feature.icon;
             return (

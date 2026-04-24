@@ -1,11 +1,19 @@
-import { Link, useLocation } from "react-router-dom";
-import { LogIn, LogOut, Moon, Sun, Shield } from "lucide-react";
+import { Link, NavLink, useLocation } from "react-router-dom";
+import { LogIn, LogOut, Moon, Sun, Shield, Home, Bell, Heart, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useTheme } from "next-themes";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 import logo from "@/assets/logo.svg";
+
+const desktopLinks = [
+  { to: "/", label: "Home", icon: Home },
+  { to: "/alerts", label: "Alerts", icon: Bell },
+  { to: "/donations", label: "Donate", icon: Heart },
+  { to: "/resources", label: "Library", icon: BookOpen },
+];
 
 const titles: Record<string, string> = {
   "/": "Home",
@@ -32,16 +40,37 @@ const MobileHeader = () => {
 
   return (
     <header className="sticky top-0 z-50 border-b bg-card/90 backdrop-blur-lg">
-      <div className="flex h-14 items-center justify-between px-4">
+      <div className="flex h-14 items-center justify-between px-4 md:h-16 md:px-6">
         <Link to="/" className="flex items-center gap-2">
-          <img src={logo} alt="UmmahLink" className="h-8 w-8 rounded-md" />
+          <img src={logo} alt="UmmahLink" className="h-8 w-8 rounded-md md:h-10 md:w-10" />
           <div className="flex flex-col leading-tight">
-            <span className="font-display text-sm font-bold text-foreground">
+            <span className="font-display text-sm font-bold text-foreground md:text-base">
               Ummah<span className="text-gradient-gold">Link</span>
             </span>
-            <span className="text-[10px] text-muted-foreground">{title}</span>
+            <span className="text-[10px] text-muted-foreground md:hidden">{title}</span>
           </div>
         </Link>
+
+        <nav className="hidden items-center gap-1 md:flex">
+          {desktopLinks.map((l) => {
+            const Icon = l.icon;
+            return (
+              <NavLink
+                key={l.to}
+                to={l.to}
+                end={l.to === "/"}
+                className={({ isActive }) =>
+                  cn(
+                    "flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                    isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground"
+                  )
+                }
+              >
+                <Icon className="h-4 w-4" /> {l.label}
+              </NavLink>
+            );
+          })}
+        </nav>
 
         <div className="flex items-center gap-1">
           {isAdmin && (

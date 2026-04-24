@@ -39,7 +39,7 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="container flex min-h-[80vh] items-center justify-center py-8">
+    <div className="flex min-h-[80vh] items-center justify-center px-4 py-8">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
         <Card>
           <CardHeader className="text-center">

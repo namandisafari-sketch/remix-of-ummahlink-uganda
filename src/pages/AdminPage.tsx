@@ -40,14 +40,14 @@ const AdminPage = () => {
   }
 
   return (
-    <div className="container py-8">
+    <div className="px-4 py-6 md:px-6 md:py-8">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <div className="flex items-center gap-3 mb-6">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
             <Shield className="h-5 w-5 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="font-display text-3xl font-bold text-foreground">Admin Dashboard</h1>
+            <h1 className="font-display text-2xl font-bold text-foreground md:text-3xl">Admin Dashboard</h1>
             <p className="text-sm text-muted-foreground">Manage projects, alerts, and donations</p>
           </div>
         </div>
