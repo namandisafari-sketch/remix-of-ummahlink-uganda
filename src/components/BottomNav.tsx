@@ -1,24 +1,18 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Bell, Heart, MapPin, User } from "lucide-react";
+import { Home, Bell, Heart, MapPin, MoreHorizontal } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/contexts/AuthContext";
 
-const items = [
+const navItems = [
   { path: "/", label: "Home", icon: Home },
   { path: "/alerts", label: "Alerts", icon: Bell },
   { path: "/map", label: "Mosques", icon: MapPin },
   { path: "/donations", label: "Donate", icon: Heart },
+  { path: "/more", label: "More", icon: MoreHorizontal },
 ];
 
 const BottomNav = () => {
   const location = useLocation();
-  const { user } = useAuth();
-
-  const navItems = [
-    ...items,
-    { path: user ? "/admin" : "/auth", label: user ? "Account" : "Sign In", icon: User },
-  ];
 
   return (
     <nav

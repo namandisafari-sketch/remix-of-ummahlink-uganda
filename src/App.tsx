@@ -16,6 +16,8 @@ import DawahPage from "@/pages/DawahPage";
 import MapPage from "@/pages/MapPage";
 import AuthPage from "@/pages/AuthPage";
 import AdminPage from "@/pages/AdminPage";
+import MorePage from "@/pages/MorePage";
+import TvPage from "@/pages/TvPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +40,8 @@ const App = () => (
                   <Route path="/resources" element={<ResourcesPage />} />
                   <Route path="/dawah" element={<DawahPage />} />
                   <Route path="/map" element={<MapPage />} />
+                  <Route path="/tv" element={<TvPage />} />
+                  <Route path="/more" element={<MorePage />} />
                   <Route path="/auth" element={<AuthPage />} />
                   <Route path="/admin" element={<AdminPage />} />
                   <Route path="*" element={<NotFound />} />
