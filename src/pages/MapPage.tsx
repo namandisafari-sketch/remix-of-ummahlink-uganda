@@ -7,10 +7,13 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Navigation, Star, LocateFixed, AlertTriangle, Loader2, MessageSquare, Phone, X } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { MapPin, Navigation, Star, LocateFixed, AlertTriangle, Loader2, MessageSquare, Phone, X, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 
@@ -77,6 +80,21 @@ const Recenter = ({ center }: { center: [number, number] | null }) => {
   return null;
 };
 
+// Fix the "blue empty map" bug by invalidating the map size once layout is ready.
+const InvalidateOnReady = () => {
+  const map = useMap();
+  useEffect(() => {
+    const timers = [50, 250, 700].map((d) => setTimeout(() => map.invalidateSize(), d));
+    const onResize = () => map.invalidateSize();
+    window.addEventListener("resize", onResize);
+    return () => {
+      timers.forEach(clearTimeout);
+      window.removeEventListener("resize", onResize);
+    };
+  }, [map]);
+  return null;
+};
+
 const KAMPALA: [number, number] = [0.3163, 32.5650];
 
 const MapPage = () => {
@@ -89,6 +107,11 @@ const MapPage = () => {
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const promptedRef = useRef(false);
+
+  // Suggest mosque dialog
+  const [suggestOpen, setSuggestOpen] = useState(false);
+  const [sugBusy, setSugBusy] = useState(false);
+  const [sug, setSug] = useState({ name: "", address: "", city: "Kampala", district: "", latitude: "", longitude: "", imam_name: "", contact_phone: "", description: "" });
 
   const requestLocation = () => {
     if (!("geolocation" in navigator)) {
@@ -116,7 +139,6 @@ const MapPage = () => {
     if (promptedRef.current) return;
     promptedRef.current = true;
     requestLocation();
-    // Watch position for live updates
     if ("geolocation" in navigator) {
       const id = navigator.geolocation.watchPosition(
         (pos) => setPosition([pos.coords.latitude, pos.coords.longitude]),
@@ -212,19 +234,89 @@ const MapPage = () => {
     setRating(5);
   };
 
+  const useMyLocationForSuggestion = () => {
+    if (position) {
+      setSug({ ...sug, latitude: String(position[0]), longitude: String(position[1]) });
+      toast.success("Coordinates filled from your location");
+    } else {
+      requestLocation();
+    }
+  };
+
+  const submitSuggestion = async () => {
+    if (!user) {
+      toast.error("Sign in to suggest a mosque");
+      return;
+    }
+    if (!sug.name || !sug.latitude || !sug.longitude) {
+      toast.error("Name and coordinates are required");
+      return;
+    }
+    setSugBusy(true);
+    const { error } = await supabase.from("masjid_submissions").insert({
+      user_id: user.id,
+      name: sug.name,
+      address: sug.address || null,
+      city: sug.city || null,
+      district: sug.district || null,
+      latitude: parseFloat(sug.latitude),
+      longitude: parseFloat(sug.longitude),
+      imam_name: sug.imam_name || null,
+      contact_phone: sug.contact_phone || null,
+      description: sug.description || null,
+    });
+    setSugBusy(false);
+    if (error) return toast.error(error.message);
+    toast.success("Submitted! An admin will review it shortly.");
+    setSug({ name: "", address: "", city: "Kampala", district: "", latitude: "", longitude: "", imam_name: "", contact_phone: "", description: "" });
+    setSuggestOpen(false);
+  };
+
   return (
     <div className="flex flex-col">
       {/* Header */}
       <section className="px-4 pb-3 pt-5 md:px-6">
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <MapPin className="h-5 w-5" />
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                <MapPin className="h-5 w-5" />
+              </div>
+              <div className="min-w-0">
+                <h1 className="font-display text-2xl font-bold text-foreground md:text-3xl">Masjid Map</h1>
+                <p className="text-sm text-muted-foreground">Find nearby mosques and share live reviews</p>
+              </div>
             </div>
-            <div className="min-w-0">
-              <h1 className="font-display text-2xl font-bold text-foreground md:text-3xl">Masjid Map</h1>
-              <p className="text-sm text-muted-foreground">Find nearby mosques and share live reviews</p>
-            </div>
+            <Dialog open={suggestOpen} onOpenChange={setSuggestOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm" variant="gold" className="gap-1 shrink-0"><Plus className="h-4 w-4" /> Suggest</Button>
+              </DialogTrigger>
+              <DialogContent className="max-h-[85vh] overflow-y-auto">
+                <DialogHeader><DialogTitle>Suggest a missing mosque</DialogTitle></DialogHeader>
+                <p className="text-xs text-muted-foreground">Submissions are reviewed by an admin before going live on the map.</p>
+                <div className="space-y-3">
+                  <div><Label>Mosque name *</Label><Input value={sug.name} onChange={(e) => setSug({ ...sug, name: e.target.value })} /></div>
+                  <div><Label>Address</Label><Input value={sug.address} onChange={(e) => setSug({ ...sug, address: e.target.value })} placeholder="Street, area" /></div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div><Label>City</Label><Input value={sug.city} onChange={(e) => setSug({ ...sug, city: e.target.value })} /></div>
+                    <div><Label>District</Label><Input value={sug.district} onChange={(e) => setSug({ ...sug, district: e.target.value })} /></div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div><Label>Latitude *</Label><Input type="number" step="0.000001" value={sug.latitude} onChange={(e) => setSug({ ...sug, latitude: e.target.value })} /></div>
+                    <div><Label>Longitude *</Label><Input type="number" step="0.000001" value={sug.longitude} onChange={(e) => setSug({ ...sug, longitude: e.target.value })} /></div>
+                  </div>
+                  <Button variant="outline" size="sm" type="button" onClick={useMyLocationForSuggestion} className="w-full gap-1">
+                    <LocateFixed className="h-3 w-3" /> Use my current location
+                  </Button>
+                  <div><Label>Imam (optional)</Label><Input value={sug.imam_name} onChange={(e) => setSug({ ...sug, imam_name: e.target.value })} /></div>
+                  <div><Label>Phone (optional)</Label><Input value={sug.contact_phone} onChange={(e) => setSug({ ...sug, contact_phone: e.target.value })} /></div>
+                  <div><Label>Description / notes</Label><Textarea value={sug.description} onChange={(e) => setSug({ ...sug, description: e.target.value })} /></div>
+                  <Button onClick={submitSuggestion} disabled={sugBusy} className="w-full">
+                    {sugBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Submit for review"}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </motion.div>
 
@@ -242,17 +334,24 @@ const MapPage = () => {
 
       {/* Map */}
       <section className="px-4 md:px-6">
-        <div className="relative h-[55vh] w-full overflow-hidden rounded-xl border bg-card shadow-emerald">
+        <div className="relative h-[55vh] w-full overflow-hidden rounded-xl border bg-muted shadow-emerald">
           {isLoading && (
             <div className="absolute inset-0 z-[400] flex items-center justify-center bg-card/60 backdrop-blur-sm">
               <Loader2 className="h-6 w-6 animate-spin text-primary" />
             </div>
           )}
-          <MapContainer center={center} zoom={13} scrollWheelZoom className="h-full w-full">
+          <MapContainer
+            center={center}
+            zoom={13}
+            scrollWheelZoom
+            style={{ height: "100%", width: "100%" }}
+          >
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{y}/{x}.png"
+              url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+              maxZoom={19}
             />
+            <InvalidateOnReady />
             <Recenter center={position} />
             {position && (
               <CircleMarker
