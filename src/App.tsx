@@ -12,6 +12,7 @@ import HomePage from "@/pages/HomePage";
 import AlertsPage from "@/pages/AlertsPage";
 import DonationsPage from "@/pages/DonationsPage";
 import ResourcesPage from "@/pages/ResourcesPage";
+import DawahPage from "@/pages/DawahPage";
 import AuthPage from "@/pages/AuthPage";
 import AdminPage from "@/pages/AdminPage";
 import NotFound from "./pages/NotFound";
@@ -34,6 +35,7 @@ const App = () => (
                   <Route path="/alerts" element={<AlertsPage />} />
                   <Route path="/donations" element={<DonationsPage />} />
                   <Route path="/resources" element={<ResourcesPage />} />
+                  <Route path="/dawah" element={<DawahPage />} />
                   <Route path="/auth" element={<AuthPage />} />
                   <Route path="/admin" element={<AdminPage />} />
                   <Route path="*" element={<NotFound />} />

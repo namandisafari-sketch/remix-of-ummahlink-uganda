@@ -1,5 +1,5 @@
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { LogIn, LogOut, Moon, Sun, Shield, Home, Bell, Heart, BookOpen } from "lucide-react";
+import { LogIn, LogOut, Moon, Sun, Shield, Home, Bell, Heart, BookOpen, Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
@@ -12,6 +12,7 @@ const desktopLinks = [
   { to: "/", label: "Home", icon: Home },
   { to: "/alerts", label: "Alerts", icon: Bell },
   { to: "/donations", label: "Donate", icon: Heart },
+  { to: "/dawah", label: "Dawah", icon: Mic },
   { to: "/resources", label: "Library", icon: BookOpen },
 ];
 
@@ -20,6 +21,7 @@ const titles: Record<string, string> = {
   "/alerts": "Alerts",
   "/donations": "Donate",
   "/resources": "Library",
+  "/dawah": "Dawah Spreaders",
   "/admin": "Admin",
   "/auth": "Sign In",
 };
