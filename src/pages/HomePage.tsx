@@ -38,42 +38,7 @@ const HomePage = () => {
   return (
     <div className="flex flex-col">
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-emerald geometric-pattern">
-        <div className="relative z-10 px-5 py-12 md:py-20">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="mx-auto max-w-2xl text-center"
-          >
-            <img src={logo} alt="UmmahLink Uganda" className="mx-auto mb-4 h-20 w-20 rounded-2xl bg-card/10 p-2 shadow-lg md:h-24 md:w-24" />
-            <h1 className="font-display text-3xl font-bold tracking-tight text-primary-foreground md:text-5xl">
-              Strengthening the{" "}
-              <span className="text-gradient-gold">Ummah</span> in Uganda
-            </h1>
-            <p className="mt-3 text-sm text-primary-foreground/80 md:text-base">
-              Real-time alerts, transparent giving, and shared Islamic knowledge.
-            </p>
-            <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
-              <Link to="/alerts" className="sm:w-auto">
-                <Button variant="gold" size="lg" className="w-full gap-2 sm:w-auto">
-                  <Bell className="h-4 w-4" /> View Alerts
-                </Button>
-              </Link>
-              <Link to="/donations" className="sm:w-auto">
-                <Button size="lg" className="w-full gap-2 border border-primary-foreground/20 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 sm:w-auto">
-                  <Heart className="h-4 w-4" /> Donate Now
-                </Button>
-              </Link>
-            </div>
-          </motion.div>
-        </div>
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg viewBox="0 0 1440 60" fill="none" className="w-full">
-            <path d="M0 60V30C360 0 720 60 1080 30C1260 15 1380 15 1440 20V60H0Z" className="fill-background" />
-          </svg>
-        </div>
-      </section>
+      <HeroBanner />
 
       {/* Stats */}
       <section className="-mt-2 px-4 pb-6 md:px-6">
