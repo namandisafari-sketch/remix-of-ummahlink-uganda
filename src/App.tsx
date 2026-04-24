@@ -26,7 +26,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <div className="mx-auto flex min-h-screen max-w-md flex-col bg-background shadow-xl sm:max-w-2xl md:max-w-4xl lg:max-w-6xl xl:max-w-7xl sm:shadow-none">
+            <div className="mx-auto flex min-h-screen max-w-md flex-col bg-calm shadow-xl sm:max-w-2xl md:max-w-4xl lg:max-w-6xl xl:max-w-7xl sm:shadow-none">
               <MobileHeader />
               <main className="flex-1 pb-20 md:pb-8">
                 <Routes>
