@@ -84,6 +84,42 @@ const PrayerPrompt = () => {
     return () => clearTimeout(t);
   }, [initialPrayer]);
 
+  // Adhan audio
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [muted, setMuted] = useState<boolean>(() => localStorage.getItem("ummahlink.adhan.muted") === "1");
+
+  useEffect(() => {
+    if (!audioRef.current) {
+      const a = new Audio(adhanSrc);
+      a.preload = "auto";
+      audioRef.current = a;
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("ummahlink.adhan.muted", muted ? "1" : "0");
+    if (muted && audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+  }, [muted]);
+
+  const playAdhan = () => {
+    const a = audioRef.current;
+    if (!a || muted) return;
+    a.currentTime = 0;
+    a.play().catch(() => {
+      // Browsers block autoplay until user interacts — silent fail.
+    });
+  };
+
+  const stopAdhan = () => {
+    const a = audioRef.current;
+    if (!a) return;
+    a.pause();
+    a.currentTime = 0;
+  };
+
   // Schedule checker — fire once per prayer per day
   useEffect(() => {
     const tick = () => {
@@ -99,18 +135,20 @@ const PrayerPrompt = () => {
       const due = schedule.find((p) => p.enabled && p.time === current && !firedToday.includes(p.key));
       if (due) {
         fired[key] = [...firedToday, due.key];
-        // Keep only today
         localStorage.setItem(FIRED_KEY, JSON.stringify({ [key]: fired[key] }));
         setActivePrayer(due);
         setOpen(true);
+        playAdhan();
       }
     };
     const id = setInterval(tick, 30_000);
     tick();
     return () => clearInterval(id);
-  }, [schedule]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [schedule, muted]);
 
   const close = () => {
+    stopAdhan();
     setOpen(false);
     setShowSettings(false);
   };
