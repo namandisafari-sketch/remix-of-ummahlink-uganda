@@ -522,6 +522,57 @@ export type Database = {
         }
         Relationships: []
       }
+      tv_content: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string | null
+          id: string
+          is_live: boolean
+          platform: string
+          scheduled_at: string | null
+          sort_order: number
+          thumbnail_url: string | null
+          title: string
+          type: string
+          updated_at: string
+          video_url: string
+          views: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_live?: boolean
+          platform?: string
+          scheduled_at?: string | null
+          sort_order?: number
+          thumbnail_url?: string | null
+          title: string
+          type?: string
+          updated_at?: string
+          video_url: string
+          views?: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_live?: boolean
+          platform?: string
+          scheduled_at?: string | null
+          sort_order?: number
+          thumbnail_url?: string | null
+          title?: string
+          type?: string
+          updated_at?: string
+          video_url?: string
+          views?: number
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
