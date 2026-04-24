@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Moon, Check, X, Sunrise, Sun, Sunset, Stars, Settings2 } from "lucide-react";
+import { Moon, Check, X, Sunrise, Sun, Sunset, Stars, Settings2, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import adhanSrc from "@/assets/adhan.mp3";
 
 type PrayerKey = "fajr" | "dhuhr" | "asr" | "maghrib" | "isha";
 
