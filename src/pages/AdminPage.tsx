@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Shield, Landmark, Bell, DollarSign, Loader2 } from "lucide-react";
+import { Shield, Landmark, Bell, DollarSign, Loader2, Megaphone } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import AdminProjects from "@/components/admin/AdminProjects";
 import AdminAlerts from "@/components/admin/AdminAlerts";
 import AdminDonations from "@/components/admin/AdminDonations";
+import AdminHeroBanners from "@/components/admin/AdminHeroBanners";
 
 const AdminPage = () => {
   const { user } = useAuth();
