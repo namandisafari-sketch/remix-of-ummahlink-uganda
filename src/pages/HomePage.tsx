@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Bell, Heart, BookOpen, ArrowRight, Users, Mic } from "lucide-react";
+import { Bell, Heart, BookOpen, ArrowRight, Users, Mic, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import HeroBanner from "@/components/HeroBanner";
@@ -32,6 +32,13 @@ const features = [
     description: "Discover top sheikhs and their YouTube channels for daily inspiration.",
     link: "/dawah",
     color: "bg-primary/10 text-primary",
+  },
+  {
+    icon: MapPin,
+    title: "Masjid Map",
+    description: "Find nearby mosques in real time with community reviews and directions.",
+    link: "/map",
+    color: "bg-accent/20 text-accent-foreground",
   },
 ];
 
