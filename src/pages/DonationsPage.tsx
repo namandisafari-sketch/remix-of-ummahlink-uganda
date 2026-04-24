@@ -102,7 +102,10 @@ const DonationsPage = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
               >
-                <Card className="flex h-full flex-col">
+                <Card className="flex h-full flex-col overflow-hidden">
+                  {project.image_url && (
+                    <img src={project.image_url} alt={project.name} className="h-40 w-full object-cover" loading="lazy" />
+                  )}
                   <CardHeader>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Landmark className="h-4 w-4" />
@@ -110,8 +113,19 @@ const DonationsPage = () => {
                     </div>
                     <CardTitle className="text-lg">{project.name}</CardTitle>
                     <CardDescription>{project.description}</CardDescription>
+                    {(project.location || project.beneficiaries) && (
+                      <p className="text-xs text-muted-foreground">
+                        {project.location}{project.location && project.beneficiaries ? " • " : ""}
+                        {project.beneficiaries ? `${project.beneficiaries.toLocaleString()} beneficiaries` : ""}
+                      </p>
+                    )}
                   </CardHeader>
                   <CardContent className="mt-auto space-y-4">
+                    {project.video_links?.length > 0 && (
+                      <a href={project.video_links[0]} target="_blank" rel="noreferrer" className="block text-xs font-medium text-primary underline">
+                        ▶ Watch project video
+                      </a>
+                    )}
                     <div>
                       <div className="mb-2 flex justify-between text-sm">
                         <span className="font-medium text-foreground">{formatUGX(project.raised)} raised</span>
