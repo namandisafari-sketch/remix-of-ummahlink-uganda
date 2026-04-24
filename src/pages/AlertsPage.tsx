@@ -29,19 +29,19 @@ const AlertsPage = () => {
   });
 
   return (
-    <div className="container py-8">
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex items-start justify-between">
+    <div className="px-4 py-6 md:px-6 md:py-8">
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex items-start justify-between gap-3">
         <div>
-          <h1 className="font-display text-3xl font-bold text-foreground">Janaza & SOS Alerts</h1>
-          <p className="mt-1 text-muted-foreground">Real-time community alerts. Cached for offline viewing.</p>
+          <h1 className="font-display text-2xl font-bold text-foreground md:text-3xl">Janaza & SOS Alerts</h1>
+          <p className="mt-1 text-sm text-muted-foreground md:text-base">Real-time community alerts. Cached for offline viewing.</p>
         </div>
         <Button
           variant="hero"
           size="sm"
-          className="gap-2"
+          className="shrink-0 gap-2"
           onClick={() => user ? setShowCreate(true) : navigate("/auth")}
         >
-          <Plus className="h-4 w-4" /> Post Alert
+          <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Post Alert</span>
         </Button>
       </motion.div>
 
@@ -55,7 +55,7 @@ const AlertsPage = () => {
           <p>No active alerts right now. Alhamdulillah.</p>
         </div>
       ) : (
-        <div className="mt-8 grid gap-4 md:grid-cols-2">
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {alerts?.map((alert, i) => {
             const isJanaza = alert.type === "janaza";
             return (

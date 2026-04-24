@@ -79,10 +79,10 @@ const DonationsPage = () => {
   };
 
   return (
-    <div className="container py-8">
+    <div className="px-4 py-6 md:px-6 md:py-8">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="font-display text-3xl font-bold text-foreground">Donation Portal</h1>
-        <p className="mt-1 text-muted-foreground">
+        <h1 className="font-display text-2xl font-bold text-foreground md:text-3xl">Donation Portal</h1>
+        <p className="mt-1 text-sm text-muted-foreground md:text-base">
           Support mosque projects with full transparency. Payments via MTN & Airtel Mobile Money.
         </p>
       </motion.div>
@@ -92,7 +92,7 @@ const DonationsPage = () => {
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       ) : (
-        <div className="mt-8 grid gap-6 md:grid-cols-2">
+        <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {projects?.map((project, i) => {
             const percent = project.goal > 0 ? Math.round((project.raised / project.goal) * 100) : 0;
             return (

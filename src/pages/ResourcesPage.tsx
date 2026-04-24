@@ -121,11 +121,11 @@ const ResourcesPage = () => {
   };
 
   return (
-    <div className="container py-8">
+    <div className="px-4 py-6 md:px-6 md:py-8">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex items-start justify-between">
         <div>
-          <h1 className="font-display text-3xl font-bold text-foreground">Resource Library</h1>
-          <p className="mt-1 text-muted-foreground">Community-shared Islamic resources. Download for offline access.</p>
+          <h1 className="font-display text-2xl font-bold text-foreground md:text-3xl">Resource Library</h1>
+          <p className="mt-1 text-sm text-muted-foreground md:text-base">Community-shared Islamic resources. Download for offline access.</p>
         </div>
         <Button
           variant="hero"
@@ -168,7 +168,7 @@ const ResourcesPage = () => {
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       ) : (
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filtered.map((resource, i) => {
             const Icon = typeIcons[resource.type] || FileText;
             return (
