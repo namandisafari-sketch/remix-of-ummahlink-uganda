@@ -7,6 +7,7 @@ import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/contexts/AuthContext";
 import MobileHeader from "@/components/MobileHeader";
 import BottomNav from "@/components/BottomNav";
+import PrayerPrompt from "@/components/PrayerPrompt";
 import HomePage from "@/pages/HomePage";
 import AlertsPage from "@/pages/AlertsPage";
 import DonationsPage from "@/pages/DonationsPage";
@@ -39,6 +40,7 @@ const App = () => (
                 </Routes>
               </main>
               <BottomNav />
+              <PrayerPrompt />
             </div>
           </BrowserRouter>
         </TooltipProvider>
