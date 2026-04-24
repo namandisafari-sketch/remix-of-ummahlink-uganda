@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Shield, Landmark, Bell, DollarSign, Loader2 } from "lucide-react";
+import { Shield, Landmark, Bell, DollarSign, Loader2, Megaphone } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import AdminProjects from "@/components/admin/AdminProjects";
 import AdminAlerts from "@/components/admin/AdminAlerts";
 import AdminDonations from "@/components/admin/AdminDonations";
+import AdminHeroBanners from "@/components/admin/AdminHeroBanners";
 
 const AdminPage = () => {
   const { user } = useAuth();
@@ -53,8 +54,11 @@ const AdminPage = () => {
         </div>
       </motion.div>
 
-      <Tabs defaultValue="projects" className="mt-4">
-        <TabsList className="grid w-full grid-cols-3">
+      <Tabs defaultValue="banners" className="mt-4">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
+          <TabsTrigger value="banners" className="gap-2">
+            <Megaphone className="h-4 w-4" /> Banners
+          </TabsTrigger>
           <TabsTrigger value="projects" className="gap-2">
             <Landmark className="h-4 w-4" /> Projects
           </TabsTrigger>
@@ -66,6 +70,9 @@ const AdminPage = () => {
           </TabsTrigger>
         </TabsList>
 
+        <TabsContent value="banners">
+          <AdminHeroBanners />
+        </TabsContent>
         <TabsContent value="projects">
           <AdminProjects />
         </TabsContent>

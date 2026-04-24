@@ -115,6 +115,54 @@ export type Database = {
           },
         ]
       }
+      hero_banners: {
+        Row: {
+          active: boolean
+          badge: string | null
+          created_at: string
+          cta_label: string | null
+          cta_link: string | null
+          id: string
+          image_url: string | null
+          published_at: string
+          sort_order: number
+          subtitle: string | null
+          title: string
+          updated_at: string
+          variant: string
+        }
+        Insert: {
+          active?: boolean
+          badge?: string | null
+          created_at?: string
+          cta_label?: string | null
+          cta_link?: string | null
+          id?: string
+          image_url?: string | null
+          published_at?: string
+          sort_order?: number
+          subtitle?: string | null
+          title: string
+          updated_at?: string
+          variant?: string
+        }
+        Update: {
+          active?: boolean
+          badge?: string | null
+          created_at?: string
+          cta_label?: string | null
+          cta_link?: string | null
+          id?: string
+          image_url?: string | null
+          published_at?: string
+          sort_order?: number
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
+          variant?: string
+        }
+        Relationships: []
+      }
       mosque_projects: {
         Row: {
           active: boolean
