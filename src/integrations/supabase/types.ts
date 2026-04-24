@@ -184,6 +184,69 @@ export type Database = {
         }
         Relationships: []
       }
+      masjids: {
+        Row: {
+          active: boolean
+          address: string | null
+          city: string | null
+          contact_phone: string | null
+          country: string | null
+          created_at: string
+          description: string | null
+          district: string | null
+          facilities: string[] | null
+          id: string
+          image_url: string | null
+          imam_name: string | null
+          latitude: number
+          longitude: number
+          name: string
+          prayer_times: Json | null
+          updated_at: string
+          verified: boolean
+        }
+        Insert: {
+          active?: boolean
+          address?: string | null
+          city?: string | null
+          contact_phone?: string | null
+          country?: string | null
+          created_at?: string
+          description?: string | null
+          district?: string | null
+          facilities?: string[] | null
+          id?: string
+          image_url?: string | null
+          imam_name?: string | null
+          latitude: number
+          longitude: number
+          name: string
+          prayer_times?: Json | null
+          updated_at?: string
+          verified?: boolean
+        }
+        Update: {
+          active?: boolean
+          address?: string | null
+          city?: string | null
+          contact_phone?: string | null
+          country?: string | null
+          created_at?: string
+          description?: string | null
+          district?: string | null
+          facilities?: string[] | null
+          id?: string
+          image_url?: string | null
+          imam_name?: string | null
+          latitude?: number
+          longitude?: number
+          name?: string
+          prayer_times?: Json | null
+          updated_at?: string
+          verified?: boolean
+        }
+        Relationships: []
+      }
       mosque_projects: {
         Row: {
           active: boolean
@@ -219,6 +282,44 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      mosque_reviews: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          masjid_id: string
+          rating: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          masjid_id: string
+          rating: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          masjid_id?: string
+          rating?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mosque_reviews_masjid_id_fkey"
+            columns: ["masjid_id"]
+            isOneToOne: false
+            referencedRelation: "masjids"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
