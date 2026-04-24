@@ -54,8 +54,11 @@ const AdminPage = () => {
         </div>
       </motion.div>
 
-      <Tabs defaultValue="projects" className="mt-4">
-        <TabsList className="grid w-full grid-cols-3">
+      <Tabs defaultValue="banners" className="mt-4">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
+          <TabsTrigger value="banners" className="gap-2">
+            <Megaphone className="h-4 w-4" /> Banners
+          </TabsTrigger>
           <TabsTrigger value="projects" className="gap-2">
             <Landmark className="h-4 w-4" /> Projects
           </TabsTrigger>
@@ -67,6 +70,9 @@ const AdminPage = () => {
           </TabsTrigger>
         </TabsList>
 
+        <TabsContent value="banners">
+          <AdminHeroBanners />
+        </TabsContent>
         <TabsContent value="projects">
           <AdminProjects />
         </TabsContent>
