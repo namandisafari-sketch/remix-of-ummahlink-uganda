@@ -79,7 +79,8 @@ const AdminSheikhs = () => {
   };
 
   const toggle = async (s: Sheikh, field: "active" | "verified") => {
-    const { error } = await supabase.from("sheikhs").update({ [field]: !s[field] }).eq("id", s.id);
+    const patch = field === "active" ? { active: !s.active } : { verified: !s.verified };
+    const { error } = await supabase.from("sheikhs").update(patch).eq("id", s.id);
     if (error) return toast.error(error.message);
     qc.invalidateQueries({ queryKey: ["admin-sheikhs"] });
   };
