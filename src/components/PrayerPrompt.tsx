@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Moon, Check, X, Sunrise, Sun, Sunset, Stars, Settings2 } from "lucide-react";
+import { Moon, Check, X, Sunrise, Sun, Sunset, Stars, Settings2, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import adhanSrc from "@/assets/adhan.mp3";
 
 type PrayerKey = "fajr" | "dhuhr" | "asr" | "maghrib" | "isha";
 
@@ -83,6 +84,42 @@ const PrayerPrompt = () => {
     return () => clearTimeout(t);
   }, [initialPrayer]);
 
+  // Adhan audio
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [muted, setMuted] = useState<boolean>(() => localStorage.getItem("ummahlink.adhan.muted") === "1");
+
+  useEffect(() => {
+    if (!audioRef.current) {
+      const a = new Audio(adhanSrc);
+      a.preload = "auto";
+      audioRef.current = a;
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("ummahlink.adhan.muted", muted ? "1" : "0");
+    if (muted && audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+  }, [muted]);
+
+  const playAdhan = () => {
+    const a = audioRef.current;
+    if (!a || muted) return;
+    a.currentTime = 0;
+    a.play().catch(() => {
+      // Browsers block autoplay until user interacts — silent fail.
+    });
+  };
+
+  const stopAdhan = () => {
+    const a = audioRef.current;
+    if (!a) return;
+    a.pause();
+    a.currentTime = 0;
+  };
+
   // Schedule checker — fire once per prayer per day
   useEffect(() => {
     const tick = () => {
@@ -98,18 +135,20 @@ const PrayerPrompt = () => {
       const due = schedule.find((p) => p.enabled && p.time === current && !firedToday.includes(p.key));
       if (due) {
         fired[key] = [...firedToday, due.key];
-        // Keep only today
         localStorage.setItem(FIRED_KEY, JSON.stringify({ [key]: fired[key] }));
         setActivePrayer(due);
         setOpen(true);
+        playAdhan();
       }
     };
     const id = setInterval(tick, 30_000);
     tick();
     return () => clearInterval(id);
-  }, [schedule]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [schedule, muted]);
 
   const close = () => {
+    stopAdhan();
     setOpen(false);
     setShowSettings(false);
   };
@@ -142,13 +181,23 @@ const PrayerPrompt = () => {
             transition={{ type: "spring", damping: 22, stiffness: 260 }}
             className="relative w-full max-w-sm overflow-hidden rounded-2xl border bg-card shadow-emerald"
           >
-            <button
-              onClick={close}
-              aria-label="Dismiss"
-              className="absolute right-3 top-3 z-10 rounded-full bg-primary-foreground/15 p-1.5 text-primary-foreground/90 backdrop-blur-sm transition-colors hover:bg-primary-foreground/25"
-            >
-              <X className="h-4 w-4" />
-            </button>
+            <div className="absolute right-3 top-3 z-10 flex gap-1.5">
+              <button
+                onClick={() => setMuted((m) => !m)}
+                aria-label={muted ? "Unmute adhan" : "Mute adhan"}
+                title={muted ? "Adhan muted" : "Adhan on"}
+                className="rounded-full bg-primary-foreground/15 p-1.5 text-primary-foreground/90 backdrop-blur-sm transition-colors hover:bg-primary-foreground/25"
+              >
+                {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+              </button>
+              <button
+                onClick={close}
+                aria-label="Dismiss"
+                className="rounded-full bg-primary-foreground/15 p-1.5 text-primary-foreground/90 backdrop-blur-sm transition-colors hover:bg-primary-foreground/25"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
 
             {/* Calming gradient header with soft glowing orbs */}
             <div className="relative overflow-hidden px-5 pb-6 pt-8 text-center">
