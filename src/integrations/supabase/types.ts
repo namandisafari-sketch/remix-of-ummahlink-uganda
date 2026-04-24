@@ -184,6 +184,66 @@ export type Database = {
         }
         Relationships: []
       }
+      masjid_submissions: {
+        Row: {
+          address: string | null
+          admin_notes: string | null
+          city: string | null
+          contact_phone: string | null
+          created_at: string
+          description: string | null
+          district: string | null
+          id: string
+          imam_name: string | null
+          latitude: number
+          longitude: number
+          name: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          admin_notes?: string | null
+          city?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          district?: string | null
+          id?: string
+          imam_name?: string | null
+          latitude: number
+          longitude: number
+          name: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          admin_notes?: string | null
+          city?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          district?: string | null
+          id?: string
+          imam_name?: string | null
+          latitude?: number
+          longitude?: number
+          name?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       masjids: {
         Row: {
           active: boolean
@@ -250,36 +310,57 @@ export type Database = {
       mosque_projects: {
         Row: {
           active: boolean
+          beneficiaries: number | null
+          category: string | null
           created_at: string
+          deadline: string | null
           description: string | null
+          gallery: string[] | null
           goal: number
           id: string
+          image_url: string | null
+          location: string | null
           mosque: string
           name: string
           raised: number
           updated_at: string
+          video_links: string[] | null
         }
         Insert: {
           active?: boolean
+          beneficiaries?: number | null
+          category?: string | null
           created_at?: string
+          deadline?: string | null
           description?: string | null
+          gallery?: string[] | null
           goal?: number
           id?: string
+          image_url?: string | null
+          location?: string | null
           mosque: string
           name: string
           raised?: number
           updated_at?: string
+          video_links?: string[] | null
         }
         Update: {
           active?: boolean
+          beneficiaries?: number | null
+          category?: string | null
           created_at?: string
+          deadline?: string | null
           description?: string | null
+          gallery?: string[] | null
           goal?: number
           id?: string
+          image_url?: string | null
+          location?: string | null
           mosque?: string
           name?: string
           raised?: number
           updated_at?: string
+          video_links?: string[] | null
         }
         Relationships: []
       }
