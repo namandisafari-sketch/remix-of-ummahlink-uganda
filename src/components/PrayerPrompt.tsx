@@ -181,13 +181,23 @@ const PrayerPrompt = () => {
             transition={{ type: "spring", damping: 22, stiffness: 260 }}
             className="relative w-full max-w-sm overflow-hidden rounded-2xl border bg-card shadow-emerald"
           >
-            <button
-              onClick={close}
-              aria-label="Dismiss"
-              className="absolute right-3 top-3 z-10 rounded-full bg-primary-foreground/15 p-1.5 text-primary-foreground/90 backdrop-blur-sm transition-colors hover:bg-primary-foreground/25"
-            >
-              <X className="h-4 w-4" />
-            </button>
+            <div className="absolute right-3 top-3 z-10 flex gap-1.5">
+              <button
+                onClick={() => setMuted((m) => !m)}
+                aria-label={muted ? "Unmute adhan" : "Mute adhan"}
+                title={muted ? "Adhan muted" : "Adhan on"}
+                className="rounded-full bg-primary-foreground/15 p-1.5 text-primary-foreground/90 backdrop-blur-sm transition-colors hover:bg-primary-foreground/25"
+              >
+                {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+              </button>
+              <button
+                onClick={close}
+                aria-label="Dismiss"
+                className="rounded-full bg-primary-foreground/15 p-1.5 text-primary-foreground/90 backdrop-blur-sm transition-colors hover:bg-primary-foreground/25"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
 
             {/* Calming gradient header with soft glowing orbs */}
             <div className="relative overflow-hidden px-5 pb-6 pt-8 text-center">
