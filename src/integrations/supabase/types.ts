@@ -62,6 +62,27 @@ export type Database = {
         }
         Relationships: []
       }
+      app_settings: {
+        Row: {
+          description: string | null
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          description?: string | null
+          key: string
+          updated_at?: string
+          value?: Json
+        }
+        Update: {
+          description?: string | null
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
+      }
       donations: {
         Row: {
           amount: number
@@ -265,6 +286,57 @@ export type Database = {
           type?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      sheikhs: {
+        Row: {
+          active: boolean
+          channel_name: string | null
+          channel_url: string
+          country: string | null
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          name: string
+          rank: number
+          subscribers: string | null
+          title: string | null
+          updated_at: string
+          verified: boolean
+        }
+        Insert: {
+          active?: boolean
+          channel_name?: string | null
+          channel_url: string
+          country?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          rank?: number
+          subscribers?: string | null
+          title?: string | null
+          updated_at?: string
+          verified?: boolean
+        }
+        Update: {
+          active?: boolean
+          channel_name?: string | null
+          channel_url?: string
+          country?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          rank?: number
+          subscribers?: string | null
+          title?: string | null
+          updated_at?: string
+          verified?: boolean
         }
         Relationships: []
       }
