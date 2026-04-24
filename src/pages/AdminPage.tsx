@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Shield, Landmark, Bell, DollarSign, Loader2, Megaphone, Mic, Users, BookOpen, Settings, LayoutDashboard } from "lucide-react";
+import { Shield, Landmark, Bell, DollarSign, Loader2, Megaphone, Mic, Users, BookOpen, Settings, LayoutDashboard, MapPin } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
@@ -12,6 +12,7 @@ import AdminDashboard from "@/components/admin/AdminDashboard";
 import AdminSheikhs from "@/components/admin/AdminSheikhs";
 import AdminUsers from "@/components/admin/AdminUsers";
 import AdminResources from "@/components/admin/AdminResources";
+import AdminMosques from "@/components/admin/AdminMosques";
 import AdminSettings from "@/components/admin/AdminSettings";
 
 const AdminPage = () => {
@@ -59,13 +60,14 @@ const AdminPage = () => {
       </motion.div>
 
       <Tabs defaultValue="dashboard" className="mt-4">
-        <TabsList className="grid h-auto w-full grid-cols-3 gap-1 sm:grid-cols-5 lg:grid-cols-9">
+        <TabsList className="grid h-auto w-full grid-cols-3 gap-1 sm:grid-cols-5 lg:grid-cols-10">
           <TabsTrigger value="dashboard" className="gap-1 text-xs"><LayoutDashboard className="h-3.5 w-3.5" /> Overview</TabsTrigger>
           <TabsTrigger value="banners" className="gap-1 text-xs"><Megaphone className="h-3.5 w-3.5" /> Banners</TabsTrigger>
           <TabsTrigger value="projects" className="gap-1 text-xs"><Landmark className="h-3.5 w-3.5" /> Projects</TabsTrigger>
           <TabsTrigger value="alerts" className="gap-1 text-xs"><Bell className="h-3.5 w-3.5" /> Alerts</TabsTrigger>
           <TabsTrigger value="donations" className="gap-1 text-xs"><DollarSign className="h-3.5 w-3.5" /> Donations</TabsTrigger>
           <TabsTrigger value="sheikhs" className="gap-1 text-xs"><Mic className="h-3.5 w-3.5" /> Sheikhs</TabsTrigger>
+          <TabsTrigger value="mosques" className="gap-1 text-xs"><MapPin className="h-3.5 w-3.5" /> Mosques</TabsTrigger>
           <TabsTrigger value="resources" className="gap-1 text-xs"><BookOpen className="h-3.5 w-3.5" /> Library</TabsTrigger>
           <TabsTrigger value="users" className="gap-1 text-xs"><Users className="h-3.5 w-3.5" /> Users</TabsTrigger>
           <TabsTrigger value="settings" className="gap-1 text-xs"><Settings className="h-3.5 w-3.5" /> Settings</TabsTrigger>
@@ -77,6 +79,7 @@ const AdminPage = () => {
         <TabsContent value="alerts"><AdminAlerts /></TabsContent>
         <TabsContent value="donations"><AdminDonations /></TabsContent>
         <TabsContent value="sheikhs"><AdminSheikhs /></TabsContent>
+        <TabsContent value="mosques"><AdminMosques /></TabsContent>
         <TabsContent value="resources"><AdminResources /></TabsContent>
         <TabsContent value="users"><AdminUsers /></TabsContent>
         <TabsContent value="settings"><AdminSettings /></TabsContent>
