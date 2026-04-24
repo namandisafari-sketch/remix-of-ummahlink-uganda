@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Bell, Heart, BookOpen, ArrowRight, Users } from "lucide-react";
+import { Bell, Heart, BookOpen, ArrowRight, Users, Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import HeroBanner from "@/components/HeroBanner";
@@ -25,6 +25,13 @@ const features = [
     description: "Access Islamic guides, PDF notes, and audio lectures shared by the community.",
     link: "/resources",
     color: "bg-accent/20 text-accent-foreground",
+  },
+  {
+    icon: Mic,
+    title: "Dawah Spreaders",
+    description: "Discover top sheikhs and their YouTube channels for daily inspiration.",
+    link: "/dawah",
+    color: "bg-primary/10 text-primary",
   },
 ];
 
@@ -58,7 +65,7 @@ const HomePage = () => {
           <h2 className="font-display text-2xl font-bold text-foreground md:text-3xl">How We Serve</h2>
           <p className="mt-1 text-sm text-muted-foreground md:text-base">Three pillars connecting our community</p>
         </div>
-        <div className="mx-auto flex max-w-5xl flex-col gap-3 md:grid md:grid-cols-3">
+        <div className="mx-auto flex max-w-5xl flex-col gap-3 md:grid md:grid-cols-2 lg:grid-cols-4">
           {features.map((feature, i) => {
             const Icon = feature.icon;
             return (

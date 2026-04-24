@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Bell, Heart, BookOpen, User } from "lucide-react";
+import { Home, Bell, Heart, Mic, User } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -8,7 +8,7 @@ const items = [
   { path: "/", label: "Home", icon: Home },
   { path: "/alerts", label: "Alerts", icon: Bell },
   { path: "/donations", label: "Donate", icon: Heart },
-  { path: "/resources", label: "Library", icon: BookOpen },
+  { path: "/dawah", label: "Dawah", icon: Mic },
 ];
 
 const BottomNav = () => {

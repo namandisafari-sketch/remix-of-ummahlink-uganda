@@ -12,6 +12,7 @@ import HomePage from "@/pages/HomePage";
 import AlertsPage from "@/pages/AlertsPage";
 import DonationsPage from "@/pages/DonationsPage";
 import ResourcesPage from "@/pages/ResourcesPage";
+import DawahPage from "@/pages/DawahPage";
 import AuthPage from "@/pages/AuthPage";
 import AdminPage from "@/pages/AdminPage";
 import NotFound from "./pages/NotFound";
@@ -26,7 +27,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <div className="mx-auto flex min-h-screen max-w-md flex-col bg-background shadow-xl sm:max-w-2xl md:max-w-4xl lg:max-w-6xl xl:max-w-7xl sm:shadow-none">
+            <div className="mx-auto flex min-h-screen max-w-md flex-col bg-calm shadow-xl sm:max-w-2xl md:max-w-4xl lg:max-w-6xl xl:max-w-7xl sm:shadow-none">
               <MobileHeader />
               <main className="flex-1 pb-20 md:pb-8">
                 <Routes>
@@ -34,6 +35,7 @@ const App = () => (
                   <Route path="/alerts" element={<AlertsPage />} />
                   <Route path="/donations" element={<DonationsPage />} />
                   <Route path="/resources" element={<ResourcesPage />} />
+                  <Route path="/dawah" element={<DawahPage />} />
                   <Route path="/auth" element={<AuthPage />} />
                   <Route path="/admin" element={<AdminPage />} />
                   <Route path="*" element={<NotFound />} />
