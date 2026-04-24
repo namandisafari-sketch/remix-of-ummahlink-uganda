@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Bell, Heart, BookOpen, ArrowRight, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo.svg";
 
 const features = [
   {
