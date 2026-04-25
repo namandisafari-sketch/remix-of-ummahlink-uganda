@@ -12,6 +12,17 @@ import { toast } from "sonner";
 import { LogIn, UserPlus, Check, ArrowLeft, ArrowRight, ShieldCheck, ShieldAlert } from "lucide-react";
 import logo from "@/assets/logo.svg";
 import { AddressPicker, emptyAddress, type AddressValue } from "@/components/AddressPicker";
+import { lovable } from "@/integrations/lovable";
+
+// Strict email: standard local@domain.tld, no spaces, valid TLD chars
+const EMAIL_RE = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+// Strict Uganda phone — accepts +2567XXXXXXXX, 2567XXXXXXXX, or 07XXXXXXXX (mobile only: 7)
+const UG_PHONE_RE = /^(?:\+?256|0)?7\d{8}$/;
+const normalizeUgPhone = (raw: string) => {
+  const digits = raw.replace(/[^\d+]/g, "");
+  const m = digits.match(/^(?:\+?256|0)?(7\d{8})$/);
+  return m ? `+256${m[1]}` : null;
+};
 
 const INTERESTS = [
   "Daily reminders", "Live lectures", "Quran tafsir", "Charity & sadaqah",
