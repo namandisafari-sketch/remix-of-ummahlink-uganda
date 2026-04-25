@@ -226,6 +226,29 @@ const OnboardingPage = () => {
               >
                 {step === 1 && (
                   <>
+                    <div>
+                      <Label htmlFor="ob-phone">Phone number</Label>
+                      <Input
+                        id="ob-phone"
+                        type="tel"
+                        inputMode="tel"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="+256 7XX XXX XXX"
+                        maxLength={20}
+                      />
+                      {phone && !UG_PHONE_RE.test(phone.trim()) && (
+                        <p className="mt-1 text-xs text-destructive">
+                          Use a valid Uganda mobile number, e.g. +256 7XX XXX XXX
+                        </p>
+                      )}
+                    </div>
+                    <AddressPicker value={address} onChange={setAddress} />
+                  </>
+                )}
+
+                {step === 2 && (
+                  <>
                     <div className="space-y-2">
                       <Label>How did you find us?</Label>
                       <RadioGroup value={referralSource} onValueChange={setReferralSource}>
@@ -265,7 +288,7 @@ const OnboardingPage = () => {
                   </>
                 )}
 
-                {step === 2 && (
+                {step === 3 && (
                   <div className="flex flex-wrap gap-2">
                     {HOBBIES.map((h) => {
                       const active = hobbies.includes(h);
@@ -288,7 +311,7 @@ const OnboardingPage = () => {
                   </div>
                 )}
 
-                {step === 3 && (
+                {step === 4 && (
                   <div className="space-y-2">
                     {INTERESTS.map((i) => {
                       const active = interests.includes(i);
@@ -308,7 +331,7 @@ const OnboardingPage = () => {
                   </div>
                 )}
 
-                {step === 4 && (
+                {step === 5 && (
                   <RadioGroup value={accountPurpose} onValueChange={(v) => setAccountPurpose(v as any)}>
                     <label className="flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors hover:bg-accent">
                       <RadioGroupItem value="experience" className="mt-1" />
@@ -331,7 +354,7 @@ const OnboardingPage = () => {
                   </RadioGroup>
                 )}
 
-                {step === 5 && (
+                {step === 6 && (
                   <>
                     <div>
                       <Label>Business name</Label>
@@ -372,13 +395,13 @@ const OnboardingPage = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => (step > 1 ? setStep(step - 1) : handleSkip())}
-                disabled={submitting}
+                onClick={() => step > 1 && setStep(step - 1)}
+                disabled={submitting || step === 1}
               >
-                {step > 1 ? <><ArrowLeft className="mr-1 h-4 w-4" /> Back</> : "Skip for now"}
+                <ArrowLeft className="mr-1 h-4 w-4" /> Back
               </Button>
               <Button onClick={handleNext} disabled={!canProceed() || submitting} className="gap-1">
-                {submitting ? "Saving..." : (step === TOTAL_STEPS || (step === 4 && accountPurpose === "experience")) ? "Finish" : <>Next <ArrowRight className="h-4 w-4" /></>}
+                {submitting ? "Saving..." : (step === TOTAL_STEPS || (step === 5 && accountPurpose === "experience")) ? "Finish" : <>Next <ArrowRight className="h-4 w-4" /></>}
               </Button>
             </div>
           </CardContent>
