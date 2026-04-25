@@ -198,92 +198,179 @@ const ResourcesPage = () => {
       </motion.div>
 
       {/* Search & Filter */}
-      <div className="mt-6 space-y-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Search resources..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-10"
-          />
-        </div>
+      {(() => {
+        const formatOpts = [
+          { v: "all", label: "All" },
+          { v: "audio", label: "Audio" },
+          { v: "video", label: "Video" },
+          { v: "text", label: "Text" },
+        ] as const;
+        const scopeOpts = [
+          { v: "all", label: "All" },
+          { v: "local", label: "Local" },
+          { v: "international", label: "International" },
+        ] as const;
 
-        {/* Format filter */}
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-medium text-muted-foreground">Format:</span>
-          {([
-            { v: "all", label: "All" },
-            { v: "audio", label: "Audio" },
-            { v: "video", label: "Video" },
-            { v: "text", label: "Text" },
-          ] as const).map((f) => (
-            <Button
-              key={f.v}
-              variant={activeFormat === f.v ? "default" : "outline"}
-              size="sm"
-              onClick={() => setActiveFormat(f.v)}
-            >
-              {f.label}
-            </Button>
-          ))}
-        </div>
+        const activeCount =
+          (activeFormat !== "all" ? 1 : 0) +
+          (activeScope !== "all" ? 1 : 0) +
+          (activeReciter !== "all" ? 1 : 0) +
+          (activeCategory !== "All" ? 1 : 0);
 
-        {/* Reciter scope + selector (visible when format is audio/video/all) */}
-        {activeFormat !== "text" && (
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-medium text-muted-foreground">Reciter:</span>
-            {([
-              { v: "all", label: "All" },
-              { v: "local", label: "Local" },
-              { v: "international", label: "International" },
-            ] as const).map((s) => (
-              <Button
-                key={s.v}
-                variant={activeScope === s.v ? "default" : "outline"}
-                size="sm"
-                onClick={() => {
-                  setActiveScope(s.v);
-                  setActiveReciter("all");
-                }}
-              >
-                {s.label}
-              </Button>
-            ))}
-            {reciters.length > 0 && (
-              <Select value={activeReciter} onValueChange={setActiveReciter}>
-                <SelectTrigger className="h-9 w-[200px]">
-                  <SelectValue placeholder="All reciters" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All reciters</SelectItem>
-                  {reciters.map((r: any) => (
-                    <SelectItem key={r.name} value={r.name}>
-                      {r.name}
-                      {r.scope ? ` · ${r.scope === "local" ? "Local" : "Intl"}` : ""}
-                    </SelectItem>
+        const clearAll = () => {
+          setActiveFormat("all");
+          setActiveScope("all");
+          setActiveReciter("all");
+          setActiveCategory("All");
+        };
+
+        const FilterRow = ({ label, children }: { label: string; children: React.ReactNode }) => (
+          <div className="space-y-1.5">
+            <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+              {label}
+            </span>
+            <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible">
+              {children}
+            </div>
+          </div>
+        );
+
+        const FiltersBody = (
+          <div className="space-y-3">
+            <FilterRow label="Format">
+              {formatOpts.map((f) => (
+                <Button
+                  key={f.v}
+                  variant={activeFormat === f.v ? "default" : "outline"}
+                  size="sm"
+                  className="shrink-0"
+                  onClick={() => setActiveFormat(f.v)}
+                >
+                  {f.label}
+                </Button>
+              ))}
+            </FilterRow>
+
+            {activeFormat !== "text" && (
+              <>
+                <FilterRow label="Reciter">
+                  {scopeOpts.map((s) => (
+                    <Button
+                      key={s.v}
+                      variant={activeScope === s.v ? "default" : "outline"}
+                      size="sm"
+                      className="shrink-0"
+                      onClick={() => {
+                        setActiveScope(s.v);
+                        setActiveReciter("all");
+                      }}
+                    >
+                      {s.label}
+                    </Button>
                   ))}
-                </SelectContent>
-              </Select>
+                </FilterRow>
+                {reciters.length > 0 && (
+                  <Select value={activeReciter} onValueChange={setActiveReciter}>
+                    <SelectTrigger className="h-9 w-full md:w-[240px]">
+                      <SelectValue placeholder="All reciters" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All reciters</SelectItem>
+                      {reciters.map((r: any) => (
+                        <SelectItem key={r.name} value={r.name}>
+                          {r.name}
+                          {r.scope ? ` · ${r.scope === "local" ? "Local" : "Intl"}` : ""}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              </>
+            )}
+
+            <FilterRow label="Category">
+              {categories.map((cat) => (
+                <Button
+                  key={cat}
+                  variant={activeCategory === cat ? "default" : "outline"}
+                  size="sm"
+                  className="shrink-0"
+                  onClick={() => setActiveCategory(cat)}
+                >
+                  {cat}
+                </Button>
+              ))}
+            </FilterRow>
+
+            {activeCount > 0 && (
+              <Button variant="ghost" size="sm" className="w-full gap-1.5" onClick={clearAll}>
+                <X className="h-3.5 w-3.5" /> Clear all filters
+              </Button>
             )}
           </div>
-        )}
+        );
 
-        {/* Category filter */}
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-medium text-muted-foreground">Category:</span>
-          {categories.map((cat) => (
-            <Button
-              key={cat}
-              variant={activeCategory === cat ? "default" : "outline"}
-              size="sm"
-              onClick={() => setActiveCategory(cat)}
-            >
-              {cat}
-            </Button>
-          ))}
-        </div>
-      </div>
+        return (
+          <div className="mt-6 space-y-4">
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Search resources..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              {/* Mobile filters trigger */}
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="icon" className="relative shrink-0 md:hidden" aria-label="Open filters">
+                    <SlidersHorizontal className="h-4 w-4" />
+                    {activeCount > 0 && (
+                      <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
+                        {activeCount}
+                      </span>
+                    )}
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="bottom" className="max-h-[80vh] overflow-y-auto rounded-t-2xl">
+                  <SheetHeader className="text-left">
+                    <SheetTitle>Filter resources</SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-4">{FiltersBody}</div>
+                </SheetContent>
+              </Sheet>
+            </div>
+
+            {/* Inline filters from md up */}
+            <div className="hidden rounded-xl border border-border bg-card/30 p-4 md:block">
+              {FiltersBody}
+            </div>
+
+            {/* Mobile active filter summary */}
+            {activeCount > 0 && (
+              <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 md:hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                {activeFormat !== "all" && (
+                  <Badge variant="secondary" className="shrink-0 capitalize">{activeFormat}</Badge>
+                )}
+                {activeScope !== "all" && (
+                  <Badge variant="secondary" className="shrink-0 capitalize">{activeScope}</Badge>
+                )}
+                {activeReciter !== "all" && (
+                  <Badge variant="secondary" className="shrink-0">{activeReciter}</Badge>
+                )}
+                {activeCategory !== "All" && (
+                  <Badge variant="secondary" className="shrink-0">{activeCategory}</Badge>
+                )}
+                <Button variant="ghost" size="sm" className="h-6 shrink-0 px-2 text-xs" onClick={clearAll}>
+                  Clear
+                </Button>
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* Resources Grid */}
       {isLoading ? (
