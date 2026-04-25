@@ -14,6 +14,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { AudioPlayer } from "@/components/AudioPlayer";
 
 type ResourceType = "pdf" | "audio" | "guide" | "video";
 
