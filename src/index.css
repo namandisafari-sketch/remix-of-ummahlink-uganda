@@ -154,6 +154,19 @@
   .scrollbar-none::-webkit-scrollbar {
     display: none;
   }
+}
+
+@layer base {
+  /* Hide scrollbars globally while preserving scroll behavior */
+  * {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  *::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
 
   .bg-calm {
     background:
