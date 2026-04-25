@@ -402,6 +402,72 @@ export type Database = {
           },
         ]
       }
+      operator_applications: {
+        Row: {
+          admin_notes: string | null
+          bio: string | null
+          city: string | null
+          company_name: string
+          contact_phone: string
+          created_at: string
+          created_operator_id: string | null
+          district: string | null
+          email: string | null
+          id: string
+          license_authority: string | null
+          license_no: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+          user_id: string
+          website: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          bio?: string | null
+          city?: string | null
+          company_name: string
+          contact_phone: string
+          created_at?: string
+          created_operator_id?: string | null
+          district?: string | null
+          email?: string | null
+          id?: string
+          license_authority?: string | null
+          license_no?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+          website?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          bio?: string | null
+          city?: string | null
+          company_name?: string
+          contact_phone?: string
+          created_at?: string
+          created_operator_id?: string | null
+          district?: string | null
+          email?: string | null
+          id?: string
+          license_authority?: string | null
+          license_no?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+          website?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -595,6 +661,125 @@ export type Database = {
           title?: string | null
           updated_at?: string
           verified?: boolean
+        }
+        Relationships: []
+      }
+      tour_booking_payments: {
+        Row: {
+          amount: number
+          booking_id: string
+          created_at: string
+          currency: string
+          id: string
+          method: string
+          note: string | null
+          paid_at: string | null
+          pesapal_order_tracking_id: string | null
+          pesapal_transaction_id: string | null
+          recorded_by: string | null
+          reference: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          booking_id: string
+          created_at?: string
+          currency?: string
+          id?: string
+          method: string
+          note?: string | null
+          paid_at?: string | null
+          pesapal_order_tracking_id?: string | null
+          pesapal_transaction_id?: string | null
+          recorded_by?: string | null
+          reference?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          booking_id?: string
+          created_at?: string
+          currency?: string
+          id?: string
+          method?: string
+          note?: string | null
+          paid_at?: string | null
+          pesapal_order_tracking_id?: string | null
+          pesapal_transaction_id?: string | null
+          recorded_by?: string | null
+          reference?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_booking_payments_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "tour_bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tour_bookings: {
+        Row: {
+          created_at: string
+          currency: string
+          departure_date: string | null
+          emergency_contact: string | null
+          id: string
+          notes: string | null
+          operator_id: string
+          package_id: string
+          paid_amount: number
+          passenger_email: string | null
+          passenger_name: string
+          passenger_phone: string
+          passport_no: string | null
+          status: string
+          total_amount: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          departure_date?: string | null
+          emergency_contact?: string | null
+          id?: string
+          notes?: string | null
+          operator_id: string
+          package_id: string
+          paid_amount?: number
+          passenger_email?: string | null
+          passenger_name: string
+          passenger_phone: string
+          passport_no?: string | null
+          status?: string
+          total_amount?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          departure_date?: string | null
+          emergency_contact?: string | null
+          id?: string
+          notes?: string | null
+          operator_id?: string
+          package_id?: string
+          paid_amount?: number
+          passenger_email?: string | null
+          passenger_name?: string
+          passenger_phone?: string
+          passport_no?: string | null
+          status?: string
+          total_amount?: number
+          updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
