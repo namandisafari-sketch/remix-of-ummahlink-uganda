@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Search, FileText, Headphones, BookOpen, Download, Upload, Loader2, Video, ExternalLink } from "lucide-react";
+import { Search, FileText, Headphones, BookOpen, Download, Upload, Loader2, Video, ExternalLink, SlidersHorizontal, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
