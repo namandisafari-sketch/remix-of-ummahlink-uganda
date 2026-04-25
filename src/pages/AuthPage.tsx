@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { LogIn, UserPlus, Check, ArrowLeft, ArrowRight, ShieldCheck, ShieldAlert } from "lucide-react";
 import logo from "@/assets/logo.svg";
-import { AddressPicker, type AddressValue } from "@/components/AddressPicker";
+import { AddressPicker, emptyAddress, type AddressValue } from "@/components/AddressPicker";
 
 const INTERESTS = [
   "Daily reminders", "Live lectures", "Quran tafsir", "Charity & sadaqah",
@@ -43,12 +43,7 @@ const AuthPage = () => {
   const [phone, setPhone] = useState("");
   const [city, setCity] = useState("");
   const [preferredMosque, setPreferredMosque] = useState("");
-  const [address, setAddress] = useState<AddressValue>({
-    region: "",
-    district: "",
-    constituency: "",
-    street: "",
-  });
+  const [address, setAddress] = useState<AddressValue>(emptyAddress);
   const [interests, setInterests] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const { signIn, signUp } = useAuth();
@@ -68,7 +63,7 @@ const AuthPage = () => {
 
   const canProceed = () => {
     if (step === 1) return displayName.trim().length >= 2 && phone.trim().length >= 7 && /^\S+@\S+\.\S+$/.test(email);
-    if (step === 2) return !!address.region && !!address.district && !!address.constituency;
+    if (step === 2) return !!address.region && !!address.district && !!address.constituency && !!address.subcounty && !!address.parish;
     if (step === 3) return pwValid && password === confirmPassword;
     return true;
   };
@@ -104,7 +99,9 @@ const AuthPage = () => {
             region: address.region || null,
             district: address.district || null,
             constituency: address.constituency || null,
-            street_address: address.street.trim() || null,
+            subcounty: address.subcounty || null,
+            parish: address.parish || null,
+            village: address.village || null,
             interests,
             business_description: preferredMosque.trim() ? `Preferred mosque: ${preferredMosque.trim()}` : null,
           },
