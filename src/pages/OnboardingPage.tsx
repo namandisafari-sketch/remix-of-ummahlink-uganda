@@ -197,18 +197,20 @@ const OnboardingPage = () => {
             </div>
             <Progress value={progress} className="h-1.5" />
             <CardTitle className="font-display mt-3 text-xl">
-              {step === 1 && "Welcome! Tell us about you"}
-              {step === 2 && "What do you enjoy?"}
-              {step === 3 && "What interests you most?"}
-              {step === 4 && "Why are you joining?"}
-              {step === 5 && "Tell us about your business"}
+              {step === 1 && "Your address & phone"}
+              {step === 2 && "Welcome! Tell us about you"}
+              {step === 3 && "What do you enjoy?"}
+              {step === 4 && "What interests you most?"}
+              {step === 5 && "Why are you joining?"}
+              {step === 6 && "Tell us about your business"}
             </CardTitle>
             <CardDescription>
-              {step === 1 && "This helps us personalize your experience"}
-              {step === 2 && "Pick your hobbies — choose any that apply"}
-              {step === 3 && "We'll tailor content to what matters to you"}
-              {step === 4 && "We're building a community + simple ad service"}
-              {step === 5 && "We'll connect you with the right audience"}
+              {step === 1 && "Required so we can serve your community"}
+              {step === 2 && "This helps us personalize your experience"}
+              {step === 3 && "Pick your hobbies — choose any that apply"}
+              {step === 4 && "We'll tailor content to what matters to you"}
+              {step === 5 && "We're building a community + simple ad service"}
+              {step === 6 && "We'll connect you with the right audience"}
             </CardDescription>
           </CardHeader>
 
