@@ -15,6 +15,8 @@ import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { AudioPlayer } from "@/components/AudioPlayer";
+import { ResourceInteractions } from "@/components/ResourceInteractions";
+import { useEffect } from "react";
 
 type ResourceType = "pdf" | "audio" | "guide" | "video";
 
@@ -72,6 +74,25 @@ const ResourcesPage = () => {
       return data;
     },
   });
+
+  // Realtime: live-update play/download counts
+  useEffect(() => {
+    const ch = supabase
+      .channel("shared_resources-counts")
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "shared_resources" },
+        (payload) => {
+          queryClient.setQueryData<any[]>(["resources"], (prev) =>
+            prev?.map((r) => (r.id === (payload.new as any).id ? { ...r, ...payload.new } : r))
+          );
+        }
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(ch);
+    };
+  }, [queryClient]);
 
   const filtered = (resources || []).filter((r) => {
     const matchesSearch =
@@ -258,6 +279,7 @@ const ResourcesPage = () => {
                         </Button>
                       </a>
                     )}
+                    <ResourceInteractions resourceId={resource.id} />
                   </CardContent>
                 </Card>
               </motion.div>
