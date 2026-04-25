@@ -147,6 +147,14 @@
     color: hsl(var(--muted-foreground) / 0.7);
   }
 
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
   .bg-calm {
     background:
       radial-gradient(1200px 600px at 10% -10%, hsl(var(--primary) / 0.10), transparent 60%),
