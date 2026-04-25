@@ -54,6 +54,7 @@ const AdminResources = () => {
   const [audioSaving, setAudioSaving] = useState(false);
   const [bulkAudio, setBulkAudio] = useState("");
   const [bulkSaving, setBulkSaving] = useState(false);
+  const [reciterScope, setReciterScope] = useState<"local" | "international">("international");
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-resources"],
