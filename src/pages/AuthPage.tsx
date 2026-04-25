@@ -60,7 +60,7 @@ const AuthPage = () => {
   };
 
   const canProceed = () => {
-    if (step === 1) return displayName.trim().length >= 2 && /^\S+@\S+\.\S+$/.test(email);
+    if (step === 1) return displayName.trim().length >= 2 && phone.trim().length >= 7 && /^\S+@\S+\.\S+$/.test(email);
     if (step === 2) return pwValid && password === confirmPassword;
     return true;
   };
@@ -229,7 +229,7 @@ const AuthPage = () => {
                           />
                         </div>
                         <div>
-                          <Label htmlFor="phone">Phone number (optional)</Label>
+                          <Label htmlFor="phone">Phone number</Label>
                           <Input
                             id="phone"
                             type="tel"
