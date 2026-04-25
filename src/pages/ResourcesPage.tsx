@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Search, FileText, Headphones, BookOpen, Download, Upload, Loader2 } from "lucide-react";
+import { Search, FileText, Headphones, BookOpen, Download, Upload, Loader2, Video, ExternalLink } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,27 +11,39 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
-type ResourceType = "pdf" | "audio" | "guide";
+type ResourceType = "pdf" | "audio" | "guide" | "video";
 
-const categories = ["All", "Fiqh", "Quran", "Hadith", "History", "Arabic", "Youth"];
+const categories = ["All", "Quran", "Fiqh", "Hadith", "History", "Arabic", "Youth"];
 
 const typeIcons: Record<string, typeof FileText> = {
   pdf: FileText,
   audio: Headphones,
   guide: BookOpen,
+  video: Video,
 };
 
 const typeColors: Record<string, string> = {
   pdf: "bg-primary/10 text-primary",
   audio: "bg-accent/20 text-accent-foreground",
   guide: "bg-emerald-light text-foreground",
+  video: "bg-destructive/10 text-destructive",
+};
+
+// Build a TikTok embed URL from any TikTok video URL
+const tiktokEmbedUrl = (url: string): string | null => {
+  // Match https://www.tiktok.com/@user/video/123 or https://vm.tiktok.com/...
+  const m = url.match(/\/video\/(\d+)/);
+  if (m) return `https://www.tiktok.com/embed/v2/${m[1]}`;
+  return null;
 };
 
 const ResourcesPage = () => {
   const { user } = useAuth();
+  const { isAdmin } = useIsAdmin();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
@@ -127,14 +139,16 @@ const ResourcesPage = () => {
           <h1 className="font-display text-2xl font-bold text-foreground md:text-3xl">Resource Library</h1>
           <p className="mt-1 text-sm text-muted-foreground md:text-base">Community-shared Islamic resources. Download for offline access.</p>
         </div>
-        <Button
-          variant="hero"
-          size="sm"
-          className="gap-2"
-          onClick={() => user ? setShowUpload(true) : navigate("/auth")}
-        >
-          <Upload className="h-4 w-4" /> Upload
-        </Button>
+        {isAdmin && (
+          <Button
+            variant="hero"
+            size="sm"
+            className="gap-2"
+            onClick={() => user ? setShowUpload(true) : navigate("/auth")}
+          >
+            <Upload className="h-4 w-4" /> Upload
+          </Button>
+        )}
       </motion.div>
 
       {/* Search & Filter */}
@@ -169,8 +183,10 @@ const ResourcesPage = () => {
         </div>
       ) : (
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filtered.map((resource, i) => {
+          {filtered.map((resource: any, i) => {
             const Icon = typeIcons[resource.type] || FileText;
+            const isVideo = resource.type === "video" && resource.external_url;
+            const embedUrl = isVideo ? tiktokEmbedUrl(resource.external_url) : null;
             return (
               <motion.div
                 key={resource.id}
@@ -178,7 +194,19 @@ const ResourcesPage = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
               >
-                <Card className="group flex h-full flex-col transition-shadow hover:shadow-emerald">
+                <Card className="group flex h-full flex-col overflow-hidden transition-shadow hover:shadow-emerald">
+                  {isVideo && embedUrl && (
+                    <div className="relative w-full overflow-hidden bg-muted" style={{ aspectRatio: "9 / 16" }}>
+                      <iframe
+                        src={embedUrl}
+                        title={resource.title}
+                        loading="lazy"
+                        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                        allowFullScreen
+                        className="absolute inset-0 h-full w-full border-0"
+                      />
+                    </div>
+                  )}
                   <CardContent className="flex h-full flex-col p-5">
                     <div className="flex items-start justify-between gap-3">
                       <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${typeColors[resource.type] || "bg-muted"}`}>
@@ -191,12 +219,20 @@ const ResourcesPage = () => {
                     <h3 className="mt-3 font-semibold text-foreground leading-snug">{resource.title}</h3>
                     <p className="mt-1 text-sm text-muted-foreground">by {resource.author}</p>
                     <div className="mt-auto flex items-center justify-between pt-4 text-xs text-muted-foreground">
-                      <span>{resource.category} • {resource.file_size || "—"}</span>
-                      <span>{resource.downloads} downloads</span>
+                      <span>{resource.category}{resource.file_size ? ` • ${resource.file_size}` : ""}</span>
+                      <span>{isVideo ? `${resource.downloads} views` : `${resource.downloads} downloads`}</span>
                     </div>
-                    <Button variant="outline" size="sm" className="mt-3 w-full gap-2" onClick={() => handleDownload(resource)}>
-                      <Download className="h-4 w-4" /> Download
-                    </Button>
+                    {isVideo ? (
+                      <a href={resource.external_url} target="_blank" rel="noopener noreferrer" className="mt-3">
+                        <Button variant="outline" size="sm" className="w-full gap-2">
+                          <ExternalLink className="h-4 w-4" /> Open on TikTok
+                        </Button>
+                      </a>
+                    ) : (
+                      <Button variant="outline" size="sm" className="mt-3 w-full gap-2" onClick={() => handleDownload(resource)}>
+                        <Download className="h-4 w-4" /> Download
+                      </Button>
+                    )}
                   </CardContent>
                 </Card>
               </motion.div>
