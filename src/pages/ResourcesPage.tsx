@@ -35,11 +35,13 @@ const typeColors: Record<string, string> = {
 
 // Build a TikTok embed URL from any TikTok video URL
 const tiktokEmbedUrl = (url: string): string | null => {
-  // Match https://www.tiktok.com/@user/video/123 or https://vm.tiktok.com/...
   const m = url.match(/\/video\/(\d+)/);
   if (m) return `https://www.tiktok.com/embed/v2/${m[1]}`;
   return null;
 };
+
+const isDirectAudioUrl = (url?: string | null) =>
+  !!url && /\.(mp3|m4a|aac|wav|ogg|opus)(\?|$)/i.test(url);
 
 const ResourcesPage = () => {
   const { user } = useAuth();
