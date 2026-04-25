@@ -1,43 +1,61 @@
-import districtsRaw from "./districts.json";
-import constituenciesRaw from "./constituencies.json";
+import adminIndex from "./admin-index.json";
 
-export type District = {
-  district_code: number;
-  district_name: string;
-  region_code: number;
-  region_name: string;
+export type AdminIndex = Record<
+  string,
+  {
+    region: string;
+    constituencies: Record<string, Record<string, string[]>>;
+    // district -> constituency -> subcounty -> parish[]
+  }
+>;
+
+export const ADMIN: AdminIndex = adminIndex as AdminIndex;
+
+export const REGIONS: string[] = Array.from(
+  new Set(Object.values(ADMIN).map((d) => d.region))
+).sort();
+
+export const districtsByRegion = (region: string): string[] =>
+  Object.entries(ADMIN)
+    .filter(([, v]) => v.region === region)
+    .map(([k]) => k)
+    .sort();
+
+export const constituenciesByDistrict = (district: string): string[] =>
+  district && ADMIN[district] ? Object.keys(ADMIN[district].constituencies).sort() : [];
+
+export const subcountiesByConstituency = (
+  district: string,
+  constituency: string
+): string[] => {
+  const c = ADMIN[district]?.constituencies[constituency];
+  return c ? Object.keys(c).sort() : [];
 };
 
-export type Constituency = {
-  constituency_code: number;
-  constituency_name: string;
-  district_code: number;
-  district_name: string;
+export const parishesBySubcounty = (
+  district: string,
+  constituency: string,
+  subcounty: string
+): string[] => {
+  const list = ADMIN[district]?.constituencies[constituency]?.[subcounty];
+  return list ? [...list].sort() : [];
 };
 
-const titleCase = (s: string) =>
+const slug = (s: string) =>
   s
     .toLowerCase()
-    .split(/\s+/)
-    .map((w) => (w.length ? w[0].toUpperCase() + w.slice(1) : w))
-    .join(" ");
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
 
-export const DISTRICTS: District[] = (districtsRaw as District[])
-  .map((d) => ({ ...d, district_name: titleCase(d.district_name), region_name: titleCase(d.region_name) }))
-  .sort((a, b) => a.district_name.localeCompare(b.district_name));
-
-export const CONSTITUENCIES: Constituency[] = (constituenciesRaw as Constituency[])
-  .map((c) => ({
-    ...c,
-    constituency_name: titleCase(c.constituency_name),
-    district_name: titleCase(c.district_name),
-  }))
-  .sort((a, b) => a.constituency_name.localeCompare(b.constituency_name));
-
-export const REGIONS: string[] = Array.from(new Set(DISTRICTS.map((d) => d.region_name))).sort();
-
-export const districtsByRegion = (region: string) =>
-  DISTRICTS.filter((d) => d.region_name === region);
-
-export const constituenciesByDistrict = (districtName: string) =>
-  CONSTITUENCIES.filter((c) => c.district_name === districtName);
+// Lazy-load villages for a district (cached)
+const villageCache = new Map<string, Record<string, string[]>>();
+export const loadDistrictVillages = async (
+  district: string
+): Promise<Record<string, string[]>> => {
+  const key = slug(district);
+  if (villageCache.has(key)) return villageCache.get(key)!;
+  const mod = await import(`./parishes/${key}.json`);
+  const data = (mod.default || mod) as Record<string, string[]>;
+  villageCache.set(key, data);
+  return data;
+};
