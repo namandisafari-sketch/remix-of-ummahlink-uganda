@@ -207,7 +207,70 @@ const ResourcesPage = () => {
             className="pl-10"
           />
         </div>
-        <div className="flex flex-wrap gap-2">
+
+        {/* Format filter */}
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs font-medium text-muted-foreground">Format:</span>
+          {([
+            { v: "all", label: "All" },
+            { v: "audio", label: "Audio" },
+            { v: "video", label: "Video" },
+            { v: "text", label: "Text" },
+          ] as const).map((f) => (
+            <Button
+              key={f.v}
+              variant={activeFormat === f.v ? "default" : "outline"}
+              size="sm"
+              onClick={() => setActiveFormat(f.v)}
+            >
+              {f.label}
+            </Button>
+          ))}
+        </div>
+
+        {/* Reciter scope + selector (visible when format is audio/video/all) */}
+        {activeFormat !== "text" && (
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-medium text-muted-foreground">Reciter:</span>
+            {([
+              { v: "all", label: "All" },
+              { v: "local", label: "Local" },
+              { v: "international", label: "International" },
+            ] as const).map((s) => (
+              <Button
+                key={s.v}
+                variant={activeScope === s.v ? "default" : "outline"}
+                size="sm"
+                onClick={() => {
+                  setActiveScope(s.v);
+                  setActiveReciter("all");
+                }}
+              >
+                {s.label}
+              </Button>
+            ))}
+            {reciters.length > 0 && (
+              <Select value={activeReciter} onValueChange={setActiveReciter}>
+                <SelectTrigger className="h-9 w-[200px]">
+                  <SelectValue placeholder="All reciters" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All reciters</SelectItem>
+                  {reciters.map((r: any) => (
+                    <SelectItem key={r.name} value={r.name}>
+                      {r.name}
+                      {r.scope ? ` · ${r.scope === "local" ? "Local" : "Intl"}` : ""}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          </div>
+        )}
+
+        {/* Category filter */}
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs font-medium text-muted-foreground">Category:</span>
           {categories.map((cat) => (
             <Button
               key={cat}
