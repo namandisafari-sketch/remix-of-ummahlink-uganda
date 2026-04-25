@@ -478,6 +478,8 @@ const AdminResources = () => {
                         {r.embed_provider && <Badge variant="outline" className="text-[10px]">{r.embed_provider}</Badge>}
                         {r.file_size && <Badge variant="outline" className="text-[10px]">{r.file_size}</Badge>}
                         <Badge variant="outline" className="text-[10px]">{r.downloads} {r.type === "video" ? "views" : "dl"}</Badge>
+                        <Badge variant="outline" className="gap-1 text-[10px]"><Heart className="h-2.5 w-2.5" />{engagement?.likeMap.get(r.id) ?? 0}</Badge>
+                        <Badge variant="outline" className="gap-1 text-[10px]"><MessageSquare className="h-2.5 w-2.5" />{engagement?.commentMap.get(r.id) ?? 0}</Badge>
                       </div>
                     </div>
                   </div>
