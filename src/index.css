@@ -140,11 +140,11 @@
   }
 
   .placeholder-elegant::placeholder {
-    font-family: var(--font-display);
-    font-style: italic;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-style: normal;
     font-weight: 400;
-    letter-spacing: 0.01em;
-    color: hsl(var(--muted-foreground) / 0.75);
+    letter-spacing: 0.005em;
+    color: hsl(var(--muted-foreground) / 0.7);
   }
 
   .bg-calm {
