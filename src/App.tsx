@@ -20,6 +20,9 @@ import AuthPage from "@/pages/AuthPage";
 import AdminPage from "@/pages/AdminPage";
 import MorePage from "@/pages/MorePage";
 import TvPage from "@/pages/TvPage";
+import HajjUmrahPage from "@/pages/HajjUmrahPage";
+import TourOperatorPage from "@/pages/TourOperatorPage";
+import OperatorDashboard from "@/pages/OperatorDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
