@@ -53,6 +53,9 @@ const ResourcesPage = () => {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
+  const [activeFormat, setActiveFormat] = useState<"all" | "audio" | "video" | "text">("all");
+  const [activeScope, setActiveScope] = useState<"all" | "local" | "international">("all");
+  const [activeReciter, setActiveReciter] = useState<string>("all");
   const [showUpload, setShowUpload] = useState(false);
 
   // Upload state
@@ -94,12 +97,30 @@ const ResourcesPage = () => {
     };
   }, [queryClient]);
 
-  const filtered = (resources || []).filter((r) => {
+  // Reciters available based on scope (only audio/video resources count as reciters)
+  const reciters = Array.from(
+    new Map(
+      (resources || [])
+        .filter((r: any) => (r.type === "audio" || r.type === "video"))
+        .filter((r: any) => activeScope === "all" || r.reciter_scope === activeScope)
+        .map((r: any) => [r.author, { name: r.author, scope: r.reciter_scope }])
+    ).values()
+  );
+
+  const matchesFormat = (r: any) => {
+    if (activeFormat === "all") return true;
+    if (activeFormat === "text") return r.type === "pdf" || r.type === "guide";
+    return r.type === activeFormat;
+  };
+
+  const filtered = (resources || []).filter((r: any) => {
     const matchesSearch =
       r.title.toLowerCase().includes(search.toLowerCase()) ||
       r.author.toLowerCase().includes(search.toLowerCase());
     const matchesCategory = activeCategory === "All" || r.category === activeCategory;
-    return matchesSearch && matchesCategory;
+    const matchesScope = activeScope === "all" || r.reciter_scope === activeScope;
+    const matchesReciter = activeReciter === "all" || r.author === activeReciter;
+    return matchesSearch && matchesCategory && matchesFormat(r) && matchesScope && matchesReciter;
   });
 
   const handleUpload = async (e: React.FormEvent) => {
@@ -186,7 +207,70 @@ const ResourcesPage = () => {
             className="pl-10"
           />
         </div>
-        <div className="flex flex-wrap gap-2">
+
+        {/* Format filter */}
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs font-medium text-muted-foreground">Format:</span>
+          {([
+            { v: "all", label: "All" },
+            { v: "audio", label: "Audio" },
+            { v: "video", label: "Video" },
+            { v: "text", label: "Text" },
+          ] as const).map((f) => (
+            <Button
+              key={f.v}
+              variant={activeFormat === f.v ? "default" : "outline"}
+              size="sm"
+              onClick={() => setActiveFormat(f.v)}
+            >
+              {f.label}
+            </Button>
+          ))}
+        </div>
+
+        {/* Reciter scope + selector (visible when format is audio/video/all) */}
+        {activeFormat !== "text" && (
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-medium text-muted-foreground">Reciter:</span>
+            {([
+              { v: "all", label: "All" },
+              { v: "local", label: "Local" },
+              { v: "international", label: "International" },
+            ] as const).map((s) => (
+              <Button
+                key={s.v}
+                variant={activeScope === s.v ? "default" : "outline"}
+                size="sm"
+                onClick={() => {
+                  setActiveScope(s.v);
+                  setActiveReciter("all");
+                }}
+              >
+                {s.label}
+              </Button>
+            ))}
+            {reciters.length > 0 && (
+              <Select value={activeReciter} onValueChange={setActiveReciter}>
+                <SelectTrigger className="h-9 w-[200px]">
+                  <SelectValue placeholder="All reciters" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All reciters</SelectItem>
+                  {reciters.map((r: any) => (
+                    <SelectItem key={r.name} value={r.name}>
+                      {r.name}
+                      {r.scope ? ` · ${r.scope === "local" ? "Local" : "Intl"}` : ""}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          </div>
+        )}
+
+        {/* Category filter */}
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs font-medium text-muted-foreground">Category:</span>
           {categories.map((cat) => (
             <Button
               key={cat}

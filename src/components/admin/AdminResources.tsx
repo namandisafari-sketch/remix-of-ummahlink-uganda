@@ -54,6 +54,7 @@ const AdminResources = () => {
   const [audioSaving, setAudioSaving] = useState(false);
   const [bulkAudio, setBulkAudio] = useState("");
   const [bulkSaving, setBulkSaving] = useState(false);
+  const [reciterScope, setReciterScope] = useState<"local" | "international">("international");
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-resources"],
@@ -109,6 +110,7 @@ const AdminResources = () => {
       embed_provider: "tiktok",
       thumbnail_url: tiktokThumb || null,
       file_path: null,
+      reciter_scope: reciterScope,
     });
     setSaving(false);
     if (error) return toast.error(error.message);
@@ -138,6 +140,7 @@ const AdminResources = () => {
       external_url: url,
       embed_provider: "direct-audio",
       file_path: null,
+      reciter_scope: reciterScope,
     });
     setAudioSaving(false);
     if (error) return toast.error(error.message);
@@ -177,6 +180,7 @@ const AdminResources = () => {
           external_url: url,
           embed_provider: "direct-audio",
           file_path: null,
+          reciter_scope: reciterScope,
         };
       })
       .filter(Boolean) as any[];
@@ -209,7 +213,22 @@ const AdminResources = () => {
 
   return (
     <div className="mt-4 space-y-6">
-      {/* Add Quran TikTok video */}
+      {/* Reciter scope (applies to next inserts below) */}
+      <Card>
+        <CardContent className="flex flex-wrap items-center gap-3 p-4">
+          <Label className="text-sm">Reciter scope (applied to new uploads):</Label>
+          <Select value={reciterScope} onValueChange={(v) => setReciterScope(v as "local" | "international")}>
+            <SelectTrigger className="h-9 w-[200px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="local">Local</SelectItem>
+              <SelectItem value="international">International</SelectItem>
+            </SelectContent>
+          </Select>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardContent className="p-4">
           <div className="mb-3 flex items-center gap-2">
