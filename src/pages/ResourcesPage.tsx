@@ -15,6 +15,8 @@ import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { AudioPlayer } from "@/components/AudioPlayer";
+import { ResourceInteractions } from "@/components/ResourceInteractions";
+import { useEffect } from "react";
 
 type ResourceType = "pdf" | "audio" | "guide" | "video";
 
