@@ -23,11 +23,12 @@ import AdminSubmissions from "@/components/admin/AdminSubmissions";
 import AdminTv from "@/components/admin/AdminTv";
 import AdminSettings from "@/components/admin/AdminSettings";
 import AdminTours from "@/components/admin/AdminTours";
+import AdminImamApplications from "@/components/admin/AdminImamApplications";
 
 type SectionKey =
   | "dashboard" | "banners" | "projects" | "alerts" | "donations"
   | "sheikhs" | "tv" | "mosques" | "submissions" | "resources"
-  | "users" | "settings" | "tours";
+  | "users" | "settings" | "tours" | "imams";
 
 const NAV: { key: SectionKey; label: string; icon: typeof Bell; group: string }[] = [
   { key: "dashboard", label: "Overview", icon: LayoutDashboard, group: "Insights" },
@@ -42,6 +43,7 @@ const NAV: { key: SectionKey; label: string; icon: typeof Bell; group: string }[
   { key: "alerts", label: "Alerts", icon: Bell, group: "Community" },
   { key: "mosques", label: "Mosques", icon: MapPin, group: "Community" },
   { key: "submissions", label: "Submissions", icon: Inbox, group: "Community" },
+  { key: "imams", label: "Imam Applications", icon: Mic, group: "Community" },
   { key: "settings", label: "Settings", icon: Settings, group: "System" },
 ];
 
@@ -58,6 +60,7 @@ const SECTIONS: Record<SectionKey, { title: string; subtitle: string; render: ()
   alerts:      { title: "Alerts",         subtitle: "Moderate Janaza & SOS posts",           render: () => <AdminAlerts /> },
   mosques:     { title: "Mosques",        subtitle: "Verified masjids on the map",           render: () => <AdminMosques /> },
   submissions: { title: "Submissions",    subtitle: "Review user-submitted masjids",         render: () => <AdminSubmissions /> },
+  imams:       { title: "Imam Applications", subtitle: "Approve verified imams to post notifications", render: () => <AdminImamApplications /> },
   settings:    { title: "Settings",       subtitle: "App info, prayer defaults, flags",      render: () => <AdminSettings /> },
 };
 

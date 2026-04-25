@@ -7,6 +7,7 @@ import { useTheme } from "next-themes";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import logo from "@/assets/logo.svg";
+import NotificationBell from "@/components/notifications/NotificationBell";
 
 const desktopLinks = [
   { to: "/", label: "Home", icon: Home },
@@ -26,6 +27,9 @@ const titles: Record<string, string> = {
   "/map": "Masjid Map",
   "/admin": "Admin",
   "/auth": "Sign In",
+  "/notifications": "Notifications",
+  "/notifications/new": "New Notification",
+  "/imam/apply": "Imam Application",
 };
 
 const MobileHeader = () => {
@@ -77,6 +81,7 @@ const MobileHeader = () => {
         </nav>
 
         <div className="flex items-center gap-1">
+          <NotificationBell />
           {isAdmin && (
             <Link to="/admin" aria-label="Admin">
               <Button variant="ghost" size="icon">

@@ -184,6 +184,141 @@ export type Database = {
         }
         Relationships: []
       }
+      imam_applications: {
+        Row: {
+          admin_notes: string | null
+          bio: string | null
+          constituency: string | null
+          contact_phone: string
+          created_at: string
+          credentials: string | null
+          district: string | null
+          email: string | null
+          full_name: string
+          id: string
+          masjid_id: string | null
+          mosque_name: string
+          parish: string | null
+          region: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          subcounty: string | null
+          updated_at: string
+          user_id: string
+          village: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          bio?: string | null
+          constituency?: string | null
+          contact_phone: string
+          created_at?: string
+          credentials?: string | null
+          district?: string | null
+          email?: string | null
+          full_name: string
+          id?: string
+          masjid_id?: string | null
+          mosque_name: string
+          parish?: string | null
+          region?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          subcounty?: string | null
+          updated_at?: string
+          user_id: string
+          village?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          bio?: string | null
+          constituency?: string | null
+          contact_phone?: string
+          created_at?: string
+          credentials?: string | null
+          district?: string | null
+          email?: string | null
+          full_name?: string
+          id?: string
+          masjid_id?: string | null
+          mosque_name?: string
+          parish?: string | null
+          region?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          subcounty?: string | null
+          updated_at?: string
+          user_id?: string
+          village?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      imam_profiles: {
+        Row: {
+          active: boolean
+          constituency: string | null
+          contact_phone: string | null
+          created_at: string
+          district: string | null
+          full_name: string
+          id: string
+          masjid_id: string | null
+          mosque_name: string
+          parish: string | null
+          region: string | null
+          subcounty: string | null
+          updated_at: string
+          user_id: string
+          verified: boolean
+          village: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          active?: boolean
+          constituency?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          district?: string | null
+          full_name: string
+          id?: string
+          masjid_id?: string | null
+          mosque_name: string
+          parish?: string | null
+          region?: string | null
+          subcounty?: string | null
+          updated_at?: string
+          user_id: string
+          verified?: boolean
+          village?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          active?: boolean
+          constituency?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          district?: string | null
+          full_name?: string
+          id?: string
+          masjid_id?: string | null
+          mosque_name?: string
+          parish?: string | null
+          region?: string | null
+          subcounty?: string | null
+          updated_at?: string
+          user_id?: string
+          verified?: boolean
+          village?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
       masjid_submissions: {
         Row: {
           address: string | null
@@ -307,6 +442,90 @@ export type Database = {
         }
         Relationships: []
       }
+      mosque_notifications: {
+        Row: {
+          active: boolean
+          allow_rsvp: boolean
+          body: string
+          category: string
+          created_at: string
+          event_at: string | null
+          event_time: string | null
+          expires_at: string | null
+          id: string
+          imam_user_id: string
+          location_text: string | null
+          maps_link: string | null
+          masjid_id: string | null
+          mosque_name: string
+          poster_url: string | null
+          scope: string
+          target_constituency: string | null
+          target_district: string | null
+          target_parish: string | null
+          target_region: string | null
+          target_subcounty: string | null
+          target_village: string | null
+          title: string
+          updated_at: string
+          urgent: boolean
+        }
+        Insert: {
+          active?: boolean
+          allow_rsvp?: boolean
+          body: string
+          category?: string
+          created_at?: string
+          event_at?: string | null
+          event_time?: string | null
+          expires_at?: string | null
+          id?: string
+          imam_user_id: string
+          location_text?: string | null
+          maps_link?: string | null
+          masjid_id?: string | null
+          mosque_name: string
+          poster_url?: string | null
+          scope?: string
+          target_constituency?: string | null
+          target_district?: string | null
+          target_parish?: string | null
+          target_region?: string | null
+          target_subcounty?: string | null
+          target_village?: string | null
+          title: string
+          updated_at?: string
+          urgent?: boolean
+        }
+        Update: {
+          active?: boolean
+          allow_rsvp?: boolean
+          body?: string
+          category?: string
+          created_at?: string
+          event_at?: string | null
+          event_time?: string | null
+          expires_at?: string | null
+          id?: string
+          imam_user_id?: string
+          location_text?: string | null
+          maps_link?: string | null
+          masjid_id?: string | null
+          mosque_name?: string
+          poster_url?: string | null
+          scope?: string
+          target_constituency?: string | null
+          target_district?: string | null
+          target_parish?: string | null
+          target_region?: string | null
+          target_subcounty?: string | null
+          target_village?: string | null
+          title?: string
+          updated_at?: string
+          urgent?: boolean
+        }
+        Relationships: []
+      }
       mosque_projects: {
         Row: {
           active: boolean
@@ -398,6 +617,64 @@ export type Database = {
             columns: ["masjid_id"]
             isOneToOne: false
             referencedRelation: "masjids"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notification_reads: {
+        Row: {
+          id: string
+          notification_id: string
+          read_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          notification_id: string
+          read_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          notification_id?: string
+          read_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_reads_notification_id_fkey"
+            columns: ["notification_id"]
+            isOneToOne: false
+            referencedRelation: "mosque_notifications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notification_rsvps: {
+        Row: {
+          created_at: string
+          id: string
+          notification_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notification_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notification_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_rsvps_notification_id_fkey"
+            columns: ["notification_id"]
+            isOneToOne: false
+            referencedRelation: "mosque_notifications"
             referencedColumns: ["id"]
           },
         ]
@@ -1183,7 +1460,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "moderator" | "user" | "operator"
+      app_role: "admin" | "moderator" | "user" | "operator" | "imam"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1311,7 +1588,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "moderator", "user", "operator"],
+      app_role: ["admin", "moderator", "user", "operator", "imam"],
     },
   },
 } as const
