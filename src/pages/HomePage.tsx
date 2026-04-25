@@ -3,6 +3,7 @@ import { Bell, Heart, BookOpen, ArrowRight, Mic, MapPin, Sparkles, Calendar, Use
 import { Link } from "react-router-dom";
 import HeroBanner from "@/components/HeroBanner";
 import HomeUrgentBanner from "@/components/notifications/HomeUrgentBanner";
+import CommunityHelpCard from "@/components/community/CommunityHelpCard";
 import { useAuth } from "@/contexts/AuthContext";
 
 const quickActions = [
@@ -208,6 +209,9 @@ const HomePage = () => {
           })}
         </div>
       </section>
+
+      {/* Community Help (Mutual Aid / Lost & Found / Skills) */}
+      <CommunityHelpCard />
 
       {/* Community CTA — app-card style */}
       <section className="mt-6 px-4 md:px-6">

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Tv, BookOpen, Mic, Shield, ChevronRight, Settings, LogOut, Sun, Moon, Plane, Building2, Bell, Megaphone } from "lucide-react";
+import { Tv, BookOpen, Mic, Shield, ChevronRight, Settings, LogOut, Sun, Moon, Plane, Building2, Bell, Megaphone, HeartHandshake, Search, Briefcase } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
@@ -10,6 +10,9 @@ import { Button } from "@/components/ui/button";
 
 const links = [
   { to: "/notifications", icon: Bell, label: "Notifications", desc: "Calls-to-action from local imams", color: "text-primary" },
+  { to: "/community/aid", icon: HeartHandshake, label: "Mutual Aid", desc: "Request or offer help in your parish", color: "text-urgent" },
+  { to: "/community/lost-found", icon: Search, label: "Lost & Found", desc: "Reunite belongings in your area", color: "text-primary" },
+  { to: "/community/skills", icon: Briefcase, label: "Skills & Services", desc: "Find local tutors, tailors, more", color: "text-soft-gold" },
   { to: "/hajj-umrah", icon: Plane, label: "Hajj & Umrah", desc: "Trusted tour operators & packages", color: "text-primary" },
   { to: "/tv", icon: Tv, label: "UmmahLink TV", desc: "Live streams & videos", color: "text-urgent" },
   { to: "/resources", icon: BookOpen, label: "Resource Library", desc: "Books, PDFs & audio", color: "text-primary" },
