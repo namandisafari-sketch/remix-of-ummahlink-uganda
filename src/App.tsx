@@ -26,6 +26,9 @@ import OperatorDashboard from "@/pages/OperatorDashboard";
 import NotificationsPage from "@/pages/NotificationsPage";
 import NotificationComposePage from "@/pages/NotificationComposePage";
 import ImamApplyPage from "@/pages/ImamApplyPage";
+import MutualAidPage from "@/pages/community/MutualAidPage";
+import LostFoundPage from "@/pages/community/LostFoundPage";
+import SkillExchangePage from "@/pages/community/SkillExchangePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -54,6 +57,9 @@ const Shell = () => {
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/notifications/new" element={<NotificationComposePage />} />
           <Route path="/imam/apply" element={<ImamApplyPage />} />
+          <Route path="/community/aid" element={<MutualAidPage />} />
+          <Route path="/community/lost-found" element={<LostFoundPage />} />
+          <Route path="/community/skills" element={<SkillExchangePage />} />
           <Route path="/more" element={<MorePage />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/onboarding" element={<OnboardingPage />} />
