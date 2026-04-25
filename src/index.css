@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Playfair+Display:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -140,11 +140,11 @@
   }
 
   .placeholder-elegant::placeholder {
-    font-family: var(--font-display);
-    font-style: italic;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-style: normal;
     font-weight: 400;
-    letter-spacing: 0.01em;
-    color: hsl(var(--muted-foreground) / 0.75);
+    letter-spacing: 0.005em;
+    color: hsl(var(--muted-foreground) / 0.7);
   }
 
   .bg-calm {
