@@ -28,9 +28,9 @@ const MyBookingsPage = () => {
         .eq("user_id", user!.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
-      const opIds = Array.from(new Set((bookings ?? []).map((b: any) => b.operator_id as string)));
-      const pkgIds = Array.from(new Set((bookings ?? []).map((b: any) => b.package_id as string)));
-      const bookingIds = (bookings ?? []).map((b: any) => b.id as string);
+      const opIds = Array.from(new Set((bookings ?? []).map((b: any) => b.operator_id as string))) as string[];
+      const pkgIds = Array.from(new Set((bookings ?? []).map((b: any) => b.package_id as string))) as string[];
+      const bookingIds = (bookings ?? []).map((b: any) => b.id as string) as string[];
       const [ops, pkgs, payments] = await Promise.all([
         opIds.length ? supabase.from("tour_operators").select("id, name, slug, contact_phone, whatsapp").in("id", opIds) : Promise.resolve({ data: [] as any[] }),
         pkgIds.length ? supabase.from("tour_packages").select("id, name, type, tier").in("id", pkgIds) : Promise.resolve({ data: [] as any[] }),
