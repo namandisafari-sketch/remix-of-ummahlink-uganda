@@ -114,14 +114,20 @@ const AuthPage = () => {
     else handleSignUp();
   };
 
-  const progress = (step / TOTAL_STEPS) * 100;
+  const stepMeta = [
+    { n: 1, label: "Identity" },
+    { n: 2, label: "Security" },
+    { n: 3, label: "Interests" },
+  ];
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 px-4 py-8">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
         <Card className="border-border/60 shadow-xl">
           <CardHeader className="text-center">
-            <img src={logo} alt="UmmahLink" className="mx-auto mb-2 h-14 w-14 rounded-xl" />
+            <div className="mx-auto mb-3 flex h-28 w-28 items-center justify-center rounded-2xl bg-primary/5 ring-1 ring-primary/10">
+              <img src={logo} alt="UmmahLink" className="h-24 w-24 rounded-2xl" />
+            </div>
             <CardTitle className="font-display text-2xl">
               {mode === "signin"
                 ? "Welcome Back"
@@ -141,12 +147,44 @@ const AuthPage = () => {
                 : "Help us tailor your experience"}
             </CardDescription>
             {mode === "signup" && (
-              <div className="mt-3 space-y-1.5">
-                <Progress value={progress} className="h-1.5" />
-                <div className="text-xs text-muted-foreground">Step {step} of {TOTAL_STEPS}</div>
+              <div className="mt-5 px-2">
+                <div className="relative flex items-center justify-between">
+                  <div className="absolute left-4 right-4 top-4 h-0.5 bg-muted" />
+                  <div
+                    className="absolute left-4 top-4 h-0.5 bg-primary transition-all duration-300"
+                    style={{ width: `calc((100% - 2rem) * ${(step - 1) / (TOTAL_STEPS - 1)})` }}
+                  />
+                  {stepMeta.map((s) => {
+                    const done = step > s.n;
+                    const active = step === s.n;
+                    return (
+                      <div key={s.n} className="relative z-10 flex flex-col items-center gap-1.5">
+                        <div
+                          className={`flex h-8 w-8 items-center justify-center rounded-full border-2 text-xs font-semibold transition-all ${
+                            done
+                              ? "border-primary bg-primary text-primary-foreground"
+                              : active
+                              ? "border-primary bg-background text-primary ring-4 ring-primary/15"
+                              : "border-muted bg-background text-muted-foreground"
+                          }`}
+                        >
+                          {done ? <Check className="h-4 w-4" /> : s.n}
+                        </div>
+                        <span
+                          className={`text-[10px] font-medium ${
+                            active ? "text-primary" : done ? "text-foreground" : "text-muted-foreground"
+                          }`}
+                        >
+                          {s.label}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
           </CardHeader>
+
 
           <CardContent>
             {mode === "signin" ? (
