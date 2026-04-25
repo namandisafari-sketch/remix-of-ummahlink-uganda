@@ -590,11 +590,13 @@ export type Database = {
           location_city: string | null
           onboarding_completed: boolean
           onboarding_completed_at: string | null
+          parish: string | null
           referral_source: string | null
           region: string | null
-          street_address: string | null
+          subcounty: string | null
           updated_at: string
           user_id: string
+          village: string | null
         }
         Insert: {
           account_purpose?: string | null
@@ -612,11 +614,13 @@ export type Database = {
           location_city?: string | null
           onboarding_completed?: boolean
           onboarding_completed_at?: string | null
+          parish?: string | null
           referral_source?: string | null
           region?: string | null
-          street_address?: string | null
+          subcounty?: string | null
           updated_at?: string
           user_id: string
+          village?: string | null
         }
         Update: {
           account_purpose?: string | null
@@ -634,11 +638,13 @@ export type Database = {
           location_city?: string | null
           onboarding_completed?: boolean
           onboarding_completed_at?: string | null
+          parish?: string | null
           referral_source?: string | null
           region?: string | null
-          street_address?: string | null
+          subcounty?: string | null
           updated_at?: string
           user_id?: string
+          village?: string | null
         }
         Relationships: []
       }
