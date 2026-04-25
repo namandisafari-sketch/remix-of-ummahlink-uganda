@@ -14,6 +14,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ArrowLeft, ArrowRight, Sparkles, Check } from "lucide-react";
 import logo from "@/assets/logo.svg";
+import { AddressPicker, emptyAddress, type AddressValue } from "@/components/AddressPicker";
+
+const UG_PHONE_RE = /^(?:\+?256|0)?7\d{8}$/;
+const normalizeUgPhone = (raw: string) => {
+  const digits = raw.replace(/[^\d+]/g, "");
+  const m = digits.match(/^(?:\+?256|0)?(7\d{8})$/);
+  return m ? `+256${m[1]}` : null;
+};
 
 const REFERRAL_SOURCES = [
   "Friend or family",
