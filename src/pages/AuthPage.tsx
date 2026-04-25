@@ -114,13 +114,18 @@ const AuthPage = () => {
   };
 
   const handleSignUp = async () => {
+    const normalizedPhone = normalizeUgPhone(phone);
+    if (!normalizedPhone) {
+      toast.error("Enter a valid Ugandan phone number, e.g. +256 7XX XXX XXX");
+      return;
+    }
     setLoading(true);
     try {
-      await signUp(email, password, displayName);
+      await signUp(email.trim(), password, displayName);
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         await supabase.from("profiles").upsert(
-          { user_id: user.id, display_name: displayName.trim(), phone: phone.trim() || null },
+          { user_id: user.id, display_name: displayName.trim(), phone: normalizedPhone },
           { onConflict: "user_id" }
         );
         await supabase.from("user_preferences").upsert(
