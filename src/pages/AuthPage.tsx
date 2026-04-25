@@ -236,6 +236,26 @@ const AuthPage = () => {
 
 
           <CardContent>
+            {(mode === "signin" || step === 1) && (
+              <div className="mb-4 space-y-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full gap-2"
+                  onClick={handleGoogle}
+                  disabled={loading}
+                >
+                  <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="#EA4335" d="M12 10.2v3.96h5.52c-.24 1.44-1.68 4.2-5.52 4.2-3.36 0-6.12-2.76-6.12-6.36S8.64 5.64 12 5.64c1.92 0 3.24.84 3.96 1.56l2.7-2.64C16.92 2.88 14.64 1.8 12 1.8 6.6 1.8 2.16 6.24 2.16 12S6.6 22.2 12 22.2c6.96 0 9.84-4.92 9.84-7.44 0-.48-.06-.84-.12-1.2H12z"/>
+                  </svg>
+                  Continue with Google
+                </Button>
+                <div className="relative text-center">
+                  <span className="bg-card relative z-10 px-2 text-xs text-muted-foreground">or use email</span>
+                  <span className="absolute left-0 right-0 top-1/2 h-px bg-border" />
+                </div>
+              </div>
+            )}
             {mode === "signin" ? (
               <form onSubmit={handleSignIn} className="space-y-3">
                 <div>
