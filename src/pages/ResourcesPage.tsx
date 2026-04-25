@@ -43,6 +43,7 @@ const tiktokEmbedUrl = (url: string): string | null => {
 
 const ResourcesPage = () => {
   const { user } = useAuth();
+  const { isAdmin } = useIsAdmin();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
