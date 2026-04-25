@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Trash2, Download, FileText, Plus, ExternalLink, Video, Headphones } from "lucide-react";
+import { Loader2, Trash2, Download, FileText, Plus, ExternalLink, Video, Headphones, Heart, MessageSquare, TrendingUp, Library } from "lucide-react";
 import { toast } from "sonner";
 
 const QURAN_CATEGORIES = ["Quran", "Fiqh", "Hadith", "History", "Arabic", "Youth"];
@@ -67,6 +67,40 @@ const AdminResources = () => {
       return data;
     },
   });
+
+  // Insights: likes & comments per resource
+  const { data: engagement } = useQuery({
+    queryKey: ["admin-resource-engagement"],
+    queryFn: async () => {
+      const [{ data: likes }, { data: comments }] = await Promise.all([
+        supabase.from("resource_likes").select("resource_id"),
+        supabase.from("resource_comments").select("resource_id"),
+      ]);
+      const likeMap = new Map<string, number>();
+      const commentMap = new Map<string, number>();
+      (likes ?? []).forEach((l: any) => likeMap.set(l.resource_id, (likeMap.get(l.resource_id) ?? 0) + 1));
+      (comments ?? []).forEach((c: any) => commentMap.set(c.resource_id, (commentMap.get(c.resource_id) ?? 0) + 1));
+      return { likeMap, commentMap, totalLikes: likes?.length ?? 0, totalComments: comments?.length ?? 0 };
+    },
+  });
+
+  const insights = (() => {
+    if (!data) return null;
+    const totalDownloads = data.reduce((s: number, r: any) => s + (r.downloads || 0), 0);
+    const byType = data.reduce((acc: Record<string, number>, r: any) => {
+      const k = r.type === "pdf" || r.type === "guide" ? "text" : r.type;
+      acc[k] = (acc[k] ?? 0) + 1;
+      return acc;
+    }, {});
+    const enriched = data.map((r: any) => ({
+      ...r,
+      _likes: engagement?.likeMap.get(r.id) ?? 0,
+      _comments: engagement?.commentMap.get(r.id) ?? 0,
+      _score: (r.downloads || 0) + (engagement?.likeMap.get(r.id) ?? 0) * 3 + (engagement?.commentMap.get(r.id) ?? 0) * 2,
+    }));
+    const top = [...enriched].sort((a, b) => b._score - a._score).slice(0, 5);
+    return { totalDownloads, byType, top, enriched };
+  })();
 
   const handleFetchMeta = async () => {
     const url = tiktokUrl.trim();
@@ -213,6 +247,67 @@ const AdminResources = () => {
 
   return (
     <div className="mt-4 space-y-6">
+      {/* INSIGHTS */}
+      {insights && (
+        <div className="space-y-4">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { icon: Library, label: "Resources", value: data?.length ?? 0, accent: "bg-primary/10 text-primary" },
+              { icon: Download, label: "Total downloads/views", value: insights.totalDownloads, accent: "bg-accent/30 text-accent-foreground" },
+              { icon: Heart, label: "Total likes", value: engagement?.totalLikes ?? 0, accent: "bg-destructive/10 text-destructive" },
+              { icon: MessageSquare, label: "Comments", value: engagement?.totalComments ?? 0, accent: "bg-primary/10 text-primary" },
+            ].map((s) => {
+              const I = s.icon;
+              return (
+                <Card key={s.label}>
+                  <CardContent className="flex items-center gap-3 p-4">
+                    <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${s.accent}`}>
+                      <I className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold leading-none">{new Intl.NumberFormat().format(s.value)}</p>
+                      <p className="text-xs text-muted-foreground">{s.label}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+
+          <Card>
+            <CardContent className="p-4">
+              <div className="mb-3 flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-primary" />
+                <h3 className="text-sm font-semibold">Top performing resources</h3>
+                <Badge variant="secondary" className="text-[10px]">downloads + likes×3 + comments×2</Badge>
+              </div>
+              {insights.top.length === 0 ? (
+                <p className="py-4 text-center text-xs text-muted-foreground">No engagement yet.</p>
+              ) : (
+                <div className="space-y-2">
+                  {insights.top.map((r: any, i: number) => (
+                    <div key={r.id} className="flex items-center gap-3 rounded-md border p-2">
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                        {i + 1}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium">{r.title}</p>
+                        <p className="truncate text-[11px] text-muted-foreground">by {r.author} · {r.category}</p>
+                      </div>
+                      <div className="flex shrink-0 items-center gap-2 text-[11px] text-muted-foreground">
+                        <span className="flex items-center gap-1"><Download className="h-3 w-3" />{r.downloads || 0}</span>
+                        <span className="flex items-center gap-1"><Heart className="h-3 w-3" />{r._likes}</span>
+                        <span className="flex items-center gap-1"><MessageSquare className="h-3 w-3" />{r._comments}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       {/* Reciter scope (applies to next inserts below) */}
       <Card>
         <CardContent className="flex flex-wrap items-center gap-3 p-4">
@@ -383,6 +478,8 @@ const AdminResources = () => {
                         {r.embed_provider && <Badge variant="outline" className="text-[10px]">{r.embed_provider}</Badge>}
                         {r.file_size && <Badge variant="outline" className="text-[10px]">{r.file_size}</Badge>}
                         <Badge variant="outline" className="text-[10px]">{r.downloads} {r.type === "video" ? "views" : "dl"}</Badge>
+                        <Badge variant="outline" className="gap-1 text-[10px]"><Heart className="h-2.5 w-2.5" />{engagement?.likeMap.get(r.id) ?? 0}</Badge>
+                        <Badge variant="outline" className="gap-1 text-[10px]"><MessageSquare className="h-2.5 w-2.5" />{engagement?.commentMap.get(r.id) ?? 0}</Badge>
                       </div>
                     </div>
                   </div>
