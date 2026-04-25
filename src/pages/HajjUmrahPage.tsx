@@ -10,13 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
-  Search, MapPin, BadgeCheck, Star, Plane, Phone, MessageCircle,
-  SlidersHorizontal, Compass, KaabaIcon as Kaaba,
+  Search, MapPin, BadgeCheck, Star, Plane, SlidersHorizontal, Compass, Building2, Loader2,
 } from "lucide-react";
-import { Loader2 } from "lucide-react";
-
-// Lucide doesn't have a Kaaba icon — fallback alias
-import { Building2 } from "lucide-react";
 
 const TYPES = ["all", "hajj", "umrah"] as const;
 const TIERS = ["all", "economy", "standard", "vip", "family"] as const;
