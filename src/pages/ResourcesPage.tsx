@@ -97,12 +97,30 @@ const ResourcesPage = () => {
     };
   }, [queryClient]);
 
-  const filtered = (resources || []).filter((r) => {
+  // Reciters available based on scope (only audio/video resources count as reciters)
+  const reciters = Array.from(
+    new Map(
+      (resources || [])
+        .filter((r: any) => (r.type === "audio" || r.type === "video"))
+        .filter((r: any) => activeScope === "all" || r.reciter_scope === activeScope)
+        .map((r: any) => [r.author, { name: r.author, scope: r.reciter_scope }])
+    ).values()
+  );
+
+  const matchesFormat = (r: any) => {
+    if (activeFormat === "all") return true;
+    if (activeFormat === "text") return r.type === "pdf" || r.type === "guide";
+    return r.type === activeFormat;
+  };
+
+  const filtered = (resources || []).filter((r: any) => {
     const matchesSearch =
       r.title.toLowerCase().includes(search.toLowerCase()) ||
       r.author.toLowerCase().includes(search.toLowerCase());
     const matchesCategory = activeCategory === "All" || r.category === activeCategory;
-    return matchesSearch && matchesCategory;
+    const matchesScope = activeScope === "all" || r.reciter_scope === activeScope;
+    const matchesReciter = activeReciter === "all" || r.author === activeReciter;
+    return matchesSearch && matchesCategory && matchesFormat(r) && matchesScope && matchesReciter;
   });
 
   const handleUpload = async (e: React.FormEvent) => {
