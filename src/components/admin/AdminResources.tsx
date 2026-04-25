@@ -8,10 +8,13 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Trash2, Download, FileText, Plus, ExternalLink, Video } from "lucide-react";
+import { Loader2, Trash2, Download, FileText, Plus, ExternalLink, Video, Headphones } from "lucide-react";
 import { toast } from "sonner";
 
 const QURAN_CATEGORIES = ["Quran", "Fiqh", "Hadith", "History", "Arabic", "Youth"];
+
+const isLikelyAudioUrl = (url: string) =>
+  /\.(mp3|m4a|aac|wav|ogg|opus)(\?|$)/i.test(url);
 
 // Match TikTok video URLs and extract the numeric video id
 const extractTikTokVideoId = (url: string): string | null => {
@@ -42,6 +45,15 @@ const AdminResources = () => {
   const [tiktokThumb, setTiktokThumb] = useState<string | undefined>();
   const [fetching, setFetching] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  // Direct audio link state
+  const [audioUrl, setAudioUrl] = useState("");
+  const [audioTitle, setAudioTitle] = useState("");
+  const [audioAuthor, setAudioAuthor] = useState("Quran PathWay");
+  const [audioCategory, setAudioCategory] = useState("Quran");
+  const [audioSaving, setAudioSaving] = useState(false);
+  const [bulkAudio, setBulkAudio] = useState("");
+  const [bulkSaving, setBulkSaving] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-resources"],
@@ -104,6 +116,78 @@ const AdminResources = () => {
     setTiktokUrl("");
     setTiktokTitle("");
     setTiktokThumb(undefined);
+    qc.invalidateQueries({ queryKey: ["admin-resources"] });
+    qc.invalidateQueries({ queryKey: ["resources"] });
+  };
+
+  const handleAddAudio = async () => {
+    if (!user) return;
+    const url = audioUrl.trim();
+    if (!isLikelyAudioUrl(url)) {
+      toast.error("Paste a direct audio URL (must end with .mp3, .m4a, .wav, etc.)");
+      return;
+    }
+    if (!audioTitle.trim()) return toast.error("Title is required");
+    setAudioSaving(true);
+    const { error } = await supabase.from("shared_resources").insert({
+      user_id: user.id,
+      title: audioTitle.trim(),
+      author: audioAuthor.trim() || "Quran PathWay",
+      type: "audio",
+      category: audioCategory,
+      external_url: url,
+      embed_provider: "direct-audio",
+      file_path: null,
+    });
+    setAudioSaving(false);
+    if (error) return toast.error(error.message);
+    toast.success("Audio added");
+    setAudioUrl(""); setAudioTitle("");
+    qc.invalidateQueries({ queryKey: ["admin-resources"] });
+    qc.invalidateQueries({ queryKey: ["resources"] });
+  };
+
+  const handleBulkAudio = async () => {
+    if (!user) return;
+    const lines = bulkAudio.split("\n").map((l) => l.trim()).filter(Boolean);
+    const rows = lines
+      .map((line) => {
+        // Accept either "Title || URL" or just a URL
+        const parts = line.split("||").map((s) => s.trim());
+        let url = "", title = "";
+        if (parts.length >= 2) {
+          // find the part that looks like a URL
+          const urlPart = parts.find((p) => isLikelyAudioUrl(p));
+          if (!urlPart) return null;
+          url = urlPart;
+          title = parts.find((p) => p !== urlPart && p.length > 0) || urlPart.split("/").pop() || "Audio";
+        } else {
+          // try to extract URL from the line
+          const m = line.match(/https?:\/\/\S+\.(?:mp3|m4a|wav|ogg|aac|opus)/i);
+          if (!m) return null;
+          url = m[0];
+          title = line.replace(url, "").trim() || url.split("/").pop() || "Audio";
+        }
+        return {
+          user_id: user.id,
+          title,
+          author: "Quran PathWay",
+          type: "audio",
+          category: "Quran",
+          external_url: url,
+          embed_provider: "direct-audio",
+          file_path: null,
+        };
+      })
+      .filter(Boolean) as any[];
+
+    if (rows.length === 0) return toast.error("No valid audio URLs found");
+    setBulkSaving(true);
+    const { error } = await supabase.from("shared_resources").insert(rows);
+    setBulkSaving(false);
+    if (error) return toast.error(error.message);
+    toast.success(`Added ${rows.length} audio resource${rows.length === 1 ? "" : "s"}`);
+    setBulkAudio("");
     qc.invalidateQueries({ queryKey: ["admin-resources"] });
     qc.invalidateQueries({ queryKey: ["resources"] });
   };
@@ -187,6 +271,68 @@ const AdminResources = () => {
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
               Add to Resources
             </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Add direct audio link */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="mb-3 flex items-center gap-2">
+            <Headphones className="h-5 w-5 text-primary" />
+            <h3 className="font-semibold">Add audio link (plays in-app)</h3>
+          </div>
+          <p className="mb-3 text-xs text-muted-foreground">
+            Paste a direct audio URL (e.g. <code>.mp3</code> from{" "}
+            <a href="https://the-quran-project.github.io" target="_blank" rel="noreferrer" className="underline">
+              the-quran-project
+            </a>
+            ). Listeners will play it inside the app.
+          </p>
+          <div className="space-y-3">
+            <Input
+              value={audioUrl}
+              onChange={(e) => setAudioUrl(e.target.value)}
+              placeholder="https://the-quran-project.github.io/Quran-Audio/Data/1/2_242.mp3"
+            />
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <Label className="text-xs">Title</Label>
+                <Input value={audioTitle} onChange={(e) => setAudioTitle(e.target.value)} placeholder="Surah Al-Baqarah — Ayah 242" />
+              </div>
+              <div>
+                <Label className="text-xs">Reciter / Author</Label>
+                <Input value={audioAuthor} onChange={(e) => setAudioAuthor(e.target.value)} placeholder="Quran PathWay" />
+              </div>
+              <div>
+                <Label className="text-xs">Category</Label>
+                <Select value={audioCategory} onValueChange={setAudioCategory}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {QURAN_CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <Button onClick={handleAddAudio} disabled={audioSaving || !audioUrl.trim() || !audioTitle.trim()} className="gap-2">
+              {audioSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+              Add audio
+            </Button>
+
+            <div className="border-t pt-3">
+              <Label className="text-xs">Bulk add (one per line — "Title || URL" or just URL)</Label>
+              <textarea
+                value={bulkAudio}
+                onChange={(e) => setBulkAudio(e.target.value)}
+                rows={5}
+                className="mt-1 w-full rounded-md border border-input bg-background p-2 text-sm font-mono"
+                placeholder={"Surah Al-Baqarah 242 || https://.../2_242.mp3"}
+              />
+              <Button onClick={handleBulkAudio} disabled={bulkSaving || !bulkAudio.trim()} className="mt-2 gap-2" variant="outline">
+                {bulkSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                Bulk add
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
