@@ -75,6 +75,25 @@ const ResourcesPage = () => {
     },
   });
 
+  // Realtime: live-update play/download counts
+  useEffect(() => {
+    const ch = supabase
+      .channel("shared_resources-counts")
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "shared_resources" },
+        (payload) => {
+          queryClient.setQueryData<any[]>(["resources"], (prev) =>
+            prev?.map((r) => (r.id === (payload.new as any).id ? { ...r, ...payload.new } : r))
+          );
+        }
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(ch);
+    };
+  }, [queryClient]);
+
   const filtered = (resources || []).filter((r) => {
     const matchesSearch =
       r.title.toLowerCase().includes(search.toLowerCase()) ||
