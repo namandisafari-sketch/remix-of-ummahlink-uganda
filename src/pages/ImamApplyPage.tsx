@@ -1,12 +1,25 @@
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useMemo, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Mic, CheckCircle2, Clock, XCircle } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import {
+  Loader2,
+  Mic,
+  CheckCircle2,
+  Clock,
+  XCircle,
+  ArrowLeft,
+  ArrowRight,
+  User,
+  MapPin,
+  GraduationCap,
+  Send,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,12 +27,21 @@ import { toast } from "sonner";
 import { AddressPicker, emptyAddress, type AddressValue } from "@/components/AddressPicker";
 import { useImamProfile } from "@/hooks/useImamProfile";
 import { useQuery } from "@tanstack/react-query";
+import { cn } from "@/lib/utils";
+
+const STEPS = [
+  { key: "personal", title: "Personal info", icon: User, desc: "Tell us who you are" },
+  { key: "mosque", title: "Your mosque", icon: MapPin, desc: "Where do you serve?" },
+  { key: "credentials", title: "Credentials", icon: GraduationCap, desc: "Your background" },
+  { key: "review", title: "Review & submit", icon: Send, desc: "Confirm your details" },
+] as const;
 
 const ImamApplyPage = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { isImam, loading: imamLoading } = useImamProfile();
 
+  const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
@@ -79,11 +101,26 @@ const ImamApplyPage = () => {
     })();
   }, [user]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const stepValid = useMemo(() => {
+    if (step === 0) return fullName.trim().length >= 2 && phone.trim().length >= 7;
+    if (step === 1) return mosqueName.trim().length >= 2;
+    return true;
+  }, [step, fullName, phone, mosqueName]);
+
+  const next = () => {
+    if (!stepValid) {
+      toast.error("Please complete the required fields");
+      return;
+    }
+    setStep((s) => Math.min(STEPS.length - 1, s + 1));
+  };
+  const back = () => setStep((s) => Math.max(0, s - 1));
+
+  const handleSubmit = async () => {
     if (!user) return;
     if (!fullName.trim() || !phone.trim() || !mosqueName.trim()) {
       toast.error("Please fill required fields");
+      setStep(0);
       return;
     }
     setLoading(true);
@@ -164,9 +201,16 @@ const ImamApplyPage = () => {
     );
   }
 
+  const progress = ((step + 1) / STEPS.length) * 100;
+  const Current = STEPS[step];
+
   return (
     <div className="px-4 py-6 md:px-6 md:py-8">
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mx-auto max-w-2xl">
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mx-auto max-w-2xl"
+      >
         <div className="mb-4 flex items-center gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10">
             <Mic className="h-5 w-5 text-primary" />
@@ -194,81 +238,220 @@ const ImamApplyPage = () => {
           </Card>
         )}
 
-        <form onSubmit={handleSubmit}>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Application details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <Label>Full name *</Label>
-                  <Input value={fullName} onChange={(e) => setFullName(e.target.value)} required maxLength={100} />
-                </div>
-                <div>
-                  <Label>Contact phone *</Label>
-                  <Input value={phone} onChange={(e) => setPhone(e.target.value)} required placeholder="+256..." />
-                </div>
-                <div>
-                  <Label>WhatsApp</Label>
-                  <Input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="+256..." />
-                </div>
-                <div>
-                  <Label>Email</Label>
-                  <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                </div>
-              </div>
+        {/* Stepper */}
+        <div className="mb-4 space-y-3">
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <span className="font-medium">
+              Step {step + 1} of {STEPS.length}
+            </span>
+            <span>{Math.round(progress)}% complete</span>
+          </div>
+          <Progress value={progress} className="h-1.5" />
+          <div className="flex items-center justify-between gap-1">
+            {STEPS.map((s, i) => {
+              const Icon = s.icon;
+              const done = i < step;
+              const active = i === step;
+              return (
+                <button
+                  key={s.key}
+                  type="button"
+                  onClick={() => i <= step && setStep(i)}
+                  className={cn(
+                    "flex flex-1 flex-col items-center gap-1 rounded-lg p-1.5 text-center transition-colors",
+                    i <= step ? "cursor-pointer" : "cursor-not-allowed opacity-50",
+                  )}
+                >
+                  <div
+                    className={cn(
+                      "flex h-8 w-8 items-center justify-center rounded-full border-2 transition-colors",
+                      done && "border-primary bg-primary text-primary-foreground",
+                      active && "border-primary bg-primary/10 text-primary",
+                      !done && !active && "border-muted bg-muted/40 text-muted-foreground",
+                    )}
+                  >
+                    {done ? <CheckCircle2 className="h-4 w-4" /> : <Icon className="h-4 w-4" />}
+                  </div>
+                  <span
+                    className={cn(
+                      "hidden text-[10px] font-medium leading-tight sm:block",
+                      active ? "text-foreground" : "text-muted-foreground",
+                    )}
+                  >
+                    {s.title}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
-              <div>
-                <Label>Mosque name *</Label>
-                <Input
-                  value={mosqueName}
-                  onChange={(e) => setMosqueName(e.target.value)}
-                  required
-                  placeholder="e.g., Masjid Noor"
-                  maxLength={150}
-                />
-              </div>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">{Current.title}</CardTitle>
+            <p className="text-sm text-muted-foreground">{Current.desc}</p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={Current.key}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.2 }}
+                className="space-y-4"
+              >
+                {step === 0 && (
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="sm:col-span-2">
+                      <Label>Full name *</Label>
+                      <Input
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        required
+                        maxLength={100}
+                        placeholder="Sheikh Ahmed Musa"
+                      />
+                    </div>
+                    <div>
+                      <Label>Contact phone *</Label>
+                      <Input
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        required
+                        placeholder="+256..."
+                      />
+                    </div>
+                    <div>
+                      <Label>WhatsApp</Label>
+                      <Input
+                        value={whatsapp}
+                        onChange={(e) => setWhatsapp(e.target.value)}
+                        placeholder="+256..."
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <Label>Email</Label>
+                      <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                    </div>
+                  </div>
+                )}
 
-              <div className="space-y-2">
-                <Label>Mosque location</Label>
-                <p className="text-xs text-muted-foreground">
-                  Members in these areas will receive your notifications by default.
-                </p>
-                <AddressPicker value={address} onChange={setAddress} />
-              </div>
+                {step === 1 && (
+                  <>
+                    <div>
+                      <Label>Mosque name *</Label>
+                      <Input
+                        value={mosqueName}
+                        onChange={(e) => setMosqueName(e.target.value)}
+                        required
+                        placeholder="e.g., Masjid Noor"
+                        maxLength={150}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Mosque location</Label>
+                      <p className="text-xs text-muted-foreground">
+                        Members in these areas will receive your notifications by default.
+                      </p>
+                      <AddressPicker value={address} onChange={setAddress} />
+                    </div>
+                  </>
+                )}
 
-              <div>
-                <Label>Credentials / qualifications</Label>
-                <Textarea
-                  value={credentials}
-                  onChange={(e) => setCredentials(e.target.value)}
-                  placeholder="Studied at... certified by..."
-                  rows={2}
-                  maxLength={500}
-                />
-              </div>
+                {step === 2 && (
+                  <>
+                    <div>
+                      <Label>Credentials / qualifications</Label>
+                      <Textarea
+                        value={credentials}
+                        onChange={(e) => setCredentials(e.target.value)}
+                        placeholder="Studied at... certified by..."
+                        rows={3}
+                        maxLength={500}
+                      />
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {credentials.length}/500 characters
+                      </p>
+                    </div>
+                    <div>
+                      <Label>Brief bio</Label>
+                      <Textarea
+                        value={bio}
+                        onChange={(e) => setBio(e.target.value)}
+                        placeholder="A short introduction shown to your community"
+                        rows={4}
+                        maxLength={1000}
+                      />
+                      <p className="mt-1 text-xs text-muted-foreground">{bio.length}/1000 characters</p>
+                    </div>
+                  </>
+                )}
 
-              <div>
-                <Label>Brief bio</Label>
-                <Textarea
-                  value={bio}
-                  onChange={(e) => setBio(e.target.value)}
-                  placeholder="A short introduction shown to your community"
-                  rows={3}
-                  maxLength={1000}
-                />
-              </div>
+                {step === 3 && (
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground">
+                      Please review your details before submitting.
+                    </p>
+                    <div className="space-y-3 rounded-lg border bg-muted/30 p-4 text-sm">
+                      <ReviewRow label="Full name" value={fullName} />
+                      <ReviewRow label="Phone" value={phone} />
+                      {whatsapp && <ReviewRow label="WhatsApp" value={whatsapp} />}
+                      {email && <ReviewRow label="Email" value={email} />}
+                      <ReviewRow label="Mosque" value={mosqueName} />
+                      <ReviewRow
+                        label="Location"
+                        value={
+                          [address.village, address.parish, address.subcounty, address.district, address.region]
+                            .filter(Boolean)
+                            .join(", ") || "—"
+                        }
+                      />
+                      {credentials && <ReviewRow label="Credentials" value={credentials} />}
+                      {bio && <ReviewRow label="Bio" value={bio} />}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      By submitting, you confirm the information is accurate. Admin will review and notify you.
+                    </p>
+                  </div>
+                )}
+              </motion.div>
+            </AnimatePresence>
 
-              <Button type="submit" variant="hero" className="w-full" disabled={loading}>
-                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Submit application"}
+            <div className="flex items-center justify-between gap-3 border-t pt-4">
+              <Button type="button" variant="outline" onClick={back} disabled={step === 0 || loading}>
+                <ArrowLeft className="mr-1 h-4 w-4" /> Back
               </Button>
-            </CardContent>
-          </Card>
-        </form>
+              {step < STEPS.length - 1 ? (
+                <Button type="button" variant="hero" onClick={next} disabled={!stepValid}>
+                  Next <ArrowRight className="ml-1 h-4 w-4" />
+                </Button>
+              ) : (
+                <Button type="button" variant="hero" onClick={handleSubmit} disabled={loading}>
+                  {loading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <>
+                      Submit application <Send className="ml-1 h-4 w-4" />
+                    </>
+                  )}
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
       </motion.div>
     </div>
   );
 };
+
+const ReviewRow = ({ label, value }: { label: string; value: string }) => (
+  <div className="flex flex-col gap-0.5 sm:flex-row sm:gap-3">
+    <span className="min-w-[110px] text-xs font-medium uppercase tracking-wide text-muted-foreground">
+      {label}
+    </span>
+    <span className="flex-1 text-foreground">{value}</span>
+  </div>
+);
 
 export default ImamApplyPage;
