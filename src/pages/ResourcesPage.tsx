@@ -139,14 +139,16 @@ const ResourcesPage = () => {
           <h1 className="font-display text-2xl font-bold text-foreground md:text-3xl">Resource Library</h1>
           <p className="mt-1 text-sm text-muted-foreground md:text-base">Community-shared Islamic resources. Download for offline access.</p>
         </div>
-        <Button
-          variant="hero"
-          size="sm"
-          className="gap-2"
-          onClick={() => user ? setShowUpload(true) : navigate("/auth")}
-        >
-          <Upload className="h-4 w-4" /> Upload
-        </Button>
+        {isAdmin && (
+          <Button
+            variant="hero"
+            size="sm"
+            className="gap-2"
+            onClick={() => user ? setShowUpload(true) : navigate("/auth")}
+          >
+            <Upload className="h-4 w-4" /> Upload
+          </Button>
+        )}
       </motion.div>
 
       {/* Search & Filter */}
