@@ -1,13 +1,15 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Tv, BookOpen, Mic, Shield, ChevronRight, Settings, LogOut, Sun, Moon, Plane, Building2 } from "lucide-react";
+import { Tv, BookOpen, Mic, Shield, ChevronRight, Settings, LogOut, Sun, Moon, Plane, Building2, Bell, Megaphone } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useImamProfile } from "@/hooks/useImamProfile";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 
 const links = [
+  { to: "/notifications", icon: Bell, label: "Notifications", desc: "Calls-to-action from local imams", color: "text-primary" },
   { to: "/hajj-umrah", icon: Plane, label: "Hajj & Umrah", desc: "Trusted tour operators & packages", color: "text-primary" },
   { to: "/tv", icon: Tv, label: "UmmahLink TV", desc: "Live streams & videos", color: "text-urgent" },
   { to: "/resources", icon: BookOpen, label: "Resource Library", desc: "Books, PDFs & audio", color: "text-primary" },
@@ -18,6 +20,7 @@ const links = [
 const MorePage = () => {
   const { user, signOut } = useAuth();
   const { isAdmin } = useIsAdmin();
+  const { isImam } = useImamProfile();
   const { theme, setTheme } = useTheme();
 
   return (
@@ -47,6 +50,25 @@ const MorePage = () => {
             </Link>
           );
         })}
+
+        <Link to={isImam ? "/notifications/new" : "/imam/apply"}>
+          <Card className="transition hover:shadow-md">
+            <CardContent className="flex items-center gap-3 p-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-soft-gold/15">
+                <Megaphone className="h-5 w-5 text-soft-gold" />
+              </div>
+              <div className="flex-1">
+                <p className="font-semibold text-foreground">
+                  {isImam ? "Post a Notification" : "Become an Imam"}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {isImam ? "Share calls-to-action with your community" : "Apply to post community announcements"}
+                </p>
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </CardContent>
+          </Card>
+        </Link>
 
         {isAdmin && (
           <Link to="/admin">

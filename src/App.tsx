@@ -23,6 +23,9 @@ import TvPage from "@/pages/TvPage";
 import HajjUmrahPage from "@/pages/HajjUmrahPage";
 import TourOperatorPage from "@/pages/TourOperatorPage";
 import OperatorDashboard from "@/pages/OperatorDashboard";
+import NotificationsPage from "@/pages/NotificationsPage";
+import NotificationComposePage from "@/pages/NotificationComposePage";
+import ImamApplyPage from "@/pages/ImamApplyPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -48,6 +51,9 @@ const Shell = () => {
           <Route path="/hajj-umrah" element={<HajjUmrahPage />} />
           <Route path="/hajj-umrah/:slug" element={<TourOperatorPage />} />
           <Route path="/operator" element={<OperatorDashboard />} />
+          <Route path="/notifications" element={<NotificationsPage />} />
+          <Route path="/notifications/new" element={<NotificationComposePage />} />
+          <Route path="/imam/apply" element={<ImamApplyPage />} />
           <Route path="/more" element={<MorePage />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/onboarding" element={<OnboardingPage />} />
