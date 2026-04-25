@@ -1,14 +1,15 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { LogIn, UserPlus, Check } from "lucide-react";
+import { LogIn, UserPlus, Check, ArrowLeft, ArrowRight, ShieldCheck, ShieldAlert } from "lucide-react";
 import logo from "@/assets/logo.svg";
 
 const INTERESTS = [
@@ -16,10 +17,27 @@ const INTERESTS = [
   "Mosque events", "Halal businesses", "Education", "Family & parenting",
 ];
 
+const TOTAL_STEPS = 3;
+
+const scorePassword = (pw: string) => {
+  let score = 0;
+  if (pw.length >= 8) score++;
+  if (pw.length >= 12) score++;
+  if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) score++;
+  if (/\d/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+  return Math.min(score, 4);
+};
+
+const STRENGTH = ["Too weak", "Weak", "Fair", "Strong", "Very strong"];
+const STRENGTH_COLOR = ["bg-destructive", "bg-destructive", "bg-amber-500", "bg-primary", "bg-primary"];
+
 const AuthPage = () => {
-  const [isSignUp, setIsSignUp] = useState(true);
+  const [mode, setMode] = useState<"signup" | "signin">("signup");
+  const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [phone, setPhone] = useState("");
   const [city, setCity] = useState("");
@@ -29,47 +47,74 @@ const AuthPage = () => {
   const { signIn, signUp } = useAuth();
   const navigate = useNavigate();
 
+  const pwScore = useMemo(() => scorePassword(password), [password]);
+  const pwValid =
+    password.length >= 8 &&
+    /[A-Z]/.test(password) &&
+    /[a-z]/.test(password) &&
+    /\d/.test(password) &&
+    pwScore >= 3;
+
   const toggleInterest = (val: string) => {
     setInterests((prev) => (prev.includes(val) ? prev.filter((x) => x !== val) : [...prev, val]));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const canProceed = () => {
+    if (step === 1) return displayName.trim().length >= 2 && /^\S+@\S+\.\S+$/.test(email);
+    if (step === 2) return pwValid && password === confirmPassword;
+    return true;
+  };
+
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      if (isSignUp) {
-        if (!displayName.trim()) throw new Error("Please enter your name");
-        await signUp(email, password, displayName);
-        // Wait briefly for session, then save profile + preferences
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          await supabase.from("profiles").upsert(
-            { user_id: user.id, display_name: displayName.trim(), phone: phone.trim() || null },
-            { onConflict: "user_id" }
-          );
-          await supabase.from("user_preferences").upsert(
-            {
-              user_id: user.id,
-              location_city: city.trim() || null,
-              interests,
-              business_description: preferredMosque.trim() ? `Preferred mosque: ${preferredMosque.trim()}` : null,
-            },
-            { onConflict: "user_id" }
-          );
-        }
-        toast.success("Account created! Let's finish setting up.");
-        navigate("/onboarding");
-      } else {
-        await signIn(email, password);
-        toast.success("Welcome back!");
-        navigate("/");
-      }
+      await signIn(email, password);
+      toast.success("Welcome back!");
+      navigate("/");
     } catch (err: any) {
-      toast.error(err.message || "Authentication failed");
+      toast.error(err.message || "Sign in failed");
     } finally {
       setLoading(false);
     }
   };
+
+  const handleSignUp = async () => {
+    setLoading(true);
+    try {
+      await signUp(email, password, displayName);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase.from("profiles").upsert(
+          { user_id: user.id, display_name: displayName.trim(), phone: phone.trim() || null },
+          { onConflict: "user_id" }
+        );
+        await supabase.from("user_preferences").upsert(
+          {
+            user_id: user.id,
+            location_city: city.trim() || null,
+            interests,
+            business_description: preferredMosque.trim() ? `Preferred mosque: ${preferredMosque.trim()}` : null,
+          },
+          { onConflict: "user_id" }
+        );
+      }
+      toast.success("Account created! Let's finish setting up.");
+      navigate("/onboarding");
+    } catch (err: any) {
+      toast.error(err.message || "Sign up failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleNext = () => {
+    if (!canProceed()) return;
+    if (step < TOTAL_STEPS) setStep(step + 1);
+    else handleSignUp();
+  };
+
+  const progress = (step / TOTAL_STEPS) * 100;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 px-4 py-8">
@@ -78,141 +123,235 @@ const AuthPage = () => {
           <CardHeader className="text-center">
             <img src={logo} alt="UmmahLink" className="mx-auto mb-2 h-14 w-14 rounded-xl" />
             <CardTitle className="font-display text-2xl">
-              {isSignUp ? "Join UmmahLink" : "Welcome Back"}
+              {mode === "signin"
+                ? "Welcome Back"
+                : step === 1
+                ? "Join UmmahLink"
+                : step === 2
+                ? "Secure your account"
+                : "Personalize"}
             </CardTitle>
             <CardDescription>
-              {isSignUp ? "Create your account to connect with the ummah" : "Sign in to your account"}
+              {mode === "signin"
+                ? "Sign in to your account"
+                : step === 1
+                ? "Tell us who you are"
+                : step === 2
+                ? "Choose a strong password"
+                : "Help us tailor your experience"}
             </CardDescription>
+            {mode === "signup" && (
+              <div className="mt-3 space-y-1.5">
+                <Progress value={progress} className="h-1.5" />
+                <div className="text-xs text-muted-foreground">Step {step} of {TOTAL_STEPS}</div>
+              </div>
+            )}
           </CardHeader>
+
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-3">
-              <AnimatePresence mode="wait">
-                {isSignUp && (
+            {mode === "signin" ? (
+              <form onSubmit={handleSignIn} className="space-y-3">
+                <div>
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                </div>
+                <div>
+                  <Label htmlFor="password">Password</Label>
+                  <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                </div>
+                <Button type="submit" variant="hero" className="w-full gap-2" disabled={loading}>
+                  {loading ? "..." : <><LogIn className="h-4 w-4" /> Sign In</>}
+                </Button>
+                <div className="text-center">
+                  <Button type="button" variant="link" onClick={() => { setMode("signup"); setStep(1); }} className="text-sm">
+                    New here? Create an account
+                  </Button>
+                </div>
+              </form>
+            ) : (
+              <div className="space-y-4">
+                <AnimatePresence mode="wait">
                   <motion.div
-                    key="signup-fields"
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="space-y-3 overflow-hidden"
+                    key={step}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-3"
                   >
-                    <div>
-                      <Label htmlFor="displayName">Full name</Label>
-                      <Input
-                        id="displayName"
-                        value={displayName}
-                        onChange={(e) => setDisplayName(e.target.value)}
-                        placeholder="e.g. Aisha Nakato"
-                        maxLength={80}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="phone">Phone number</Label>
-                      <Input
-                        id="phone"
-                        type="tel"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        placeholder="+256 7XX XXX XXX"
-                        maxLength={20}
-                      />
-                    </div>
+                    {step === 1 && (
+                      <>
+                        <div>
+                          <Label htmlFor="displayName">Full name</Label>
+                          <Input
+                            id="displayName"
+                            value={displayName}
+                            onChange={(e) => setDisplayName(e.target.value)}
+                            placeholder="e.g. Aisha Nakato"
+                            maxLength={80}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="phone">Phone number (optional)</Label>
+                          <Input
+                            id="phone"
+                            type="tel"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            placeholder="+256 7XX XXX XXX"
+                            maxLength={20}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="email">Email</Label>
+                          <Input
+                            id="email"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="you@example.com"
+                          />
+                        </div>
+                      </>
+                    )}
+
+                    {step === 2 && (
+                      <>
+                        <div>
+                          <Label htmlFor="password">Password</Label>
+                          <Input
+                            id="password"
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="At least 8 characters"
+                            minLength={8}
+                          />
+                          {password && (
+                            <div className="mt-2 space-y-1.5">
+                              <div className="flex h-1.5 gap-1">
+                                {[0, 1, 2, 3].map((i) => (
+                                  <div
+                                    key={i}
+                                    className={`flex-1 rounded-full transition-colors ${
+                                      i < pwScore ? STRENGTH_COLOR[pwScore] : "bg-muted"
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                              <div className="flex items-center gap-1.5 text-xs">
+                                {pwValid ? (
+                                  <ShieldCheck className="h-3.5 w-3.5 text-primary" />
+                                ) : (
+                                  <ShieldAlert className="h-3.5 w-3.5 text-muted-foreground" />
+                                )}
+                                <span className={pwValid ? "text-primary" : "text-muted-foreground"}>
+                                  {STRENGTH[pwScore]}
+                                </span>
+                              </div>
+                              <ul className="space-y-0.5 text-xs text-muted-foreground">
+                                <li className={password.length >= 8 ? "text-primary" : ""}>• 8+ characters</li>
+                                <li className={/[A-Z]/.test(password) && /[a-z]/.test(password) ? "text-primary" : ""}>
+                                  • Upper &amp; lowercase letters
+                                </li>
+                                <li className={/\d/.test(password) ? "text-primary" : ""}>• At least one number</li>
+                                <li className={/[^A-Za-z0-9]/.test(password) ? "text-primary" : ""}>
+                                  • Symbol recommended
+                                </li>
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                        <div>
+                          <Label htmlFor="confirm">Confirm password</Label>
+                          <Input
+                            id="confirm"
+                            type="password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            placeholder="Re-enter password"
+                          />
+                          {confirmPassword && password !== confirmPassword && (
+                            <p className="mt-1 text-xs text-destructive">Passwords don't match</p>
+                          )}
+                        </div>
+                      </>
+                    )}
+
+                    {step === 3 && (
+                      <>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <Label htmlFor="city">Location</Label>
+                            <Input
+                              id="city"
+                              value={city}
+                              onChange={(e) => setCity(e.target.value)}
+                              placeholder="Kampala"
+                              maxLength={80}
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="mosque">Preferred mosque</Label>
+                            <Input
+                              id="mosque"
+                              value={preferredMosque}
+                              onChange={(e) => setPreferredMosque(e.target.value)}
+                              placeholder="e.g. Kibuli"
+                              maxLength={100}
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <Label>Community interests</Label>
+                          <div className="mt-2 flex flex-wrap gap-1.5">
+                            {INTERESTS.map((i) => {
+                              const active = interests.includes(i);
+                              return (
+                                <button
+                                  key={i}
+                                  type="button"
+                                  onClick={() => toggleInterest(i)}
+                                  className={`rounded-full border px-2.5 py-1 text-xs transition-all ${
+                                    active
+                                      ? "border-primary bg-primary text-primary-foreground"
+                                      : "border-border bg-background hover:bg-accent"
+                                  }`}
+                                >
+                                  {active && <Check className="mr-1 inline h-3 w-3" />}
+                                  {i}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </motion.div>
-                )}
-              </AnimatePresence>
+                </AnimatePresence>
 
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                  minLength={6}
-                />
-              </div>
-
-              <AnimatePresence>
-                {isSignUp && (
-                  <motion.div
-                    key="extras"
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="space-y-3 overflow-hidden"
+                <div className="flex items-center justify-between gap-2 pt-2">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => (step > 1 ? setStep(step - 1) : setMode("signin"))}
+                    disabled={loading}
                   >
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <Label htmlFor="city">Location</Label>
-                        <Input
-                          id="city"
-                          value={city}
-                          onChange={(e) => setCity(e.target.value)}
-                          placeholder="Kampala"
-                          maxLength={80}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="mosque">Preferred mosque</Label>
-                        <Input
-                          id="mosque"
-                          value={preferredMosque}
-                          onChange={(e) => setPreferredMosque(e.target.value)}
-                          placeholder="e.g. Kibuli"
-                          maxLength={100}
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <Label>Community interests</Label>
-                      <div className="mt-2 flex flex-wrap gap-1.5">
-                        {INTERESTS.map((i) => {
-                          const active = interests.includes(i);
-                          return (
-                            <button
-                              key={i}
-                              type="button"
-                              onClick={() => toggleInterest(i)}
-                              className={`rounded-full border px-2.5 py-1 text-xs transition-all ${
-                                active
-                                  ? "border-primary bg-primary text-primary-foreground"
-                                  : "border-border bg-background hover:bg-accent"
-                              }`}
-                            >
-                              {active && <Check className="mr-1 inline h-3 w-3" />}
-                              {i}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              <Button type="submit" variant="hero" className="w-full gap-2" disabled={loading}>
-                {loading ? "..." : isSignUp ? <><UserPlus className="h-4 w-4" /> Create account</> : <><LogIn className="h-4 w-4" /> Sign In</>}
-              </Button>
-            </form>
-            <div className="mt-3 text-center">
-              <Button variant="link" onClick={() => setIsSignUp(!isSignUp)} className="text-sm">
-                {isSignUp ? "Already have an account? Sign In" : "New here? Create an account"}
-              </Button>
-            </div>
+                    {step > 1 ? <><ArrowLeft className="mr-1 h-4 w-4" /> Back</> : "Sign in instead"}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="hero"
+                    onClick={handleNext}
+                    disabled={!canProceed() || loading}
+                    className="gap-1"
+                  >
+                    {loading ? "..." : step === TOTAL_STEPS ? <><UserPlus className="h-4 w-4" /> Create account</> : <>Next <ArrowRight className="h-4 w-4" /></>}
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </motion.div>
