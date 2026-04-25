@@ -120,6 +120,78 @@ const AdminResources = () => {
     qc.invalidateQueries({ queryKey: ["resources"] });
   };
 
+  const handleAddAudio = async () => {
+    if (!user) return;
+    const url = audioUrl.trim();
+    if (!isLikelyAudioUrl(url)) {
+      toast.error("Paste a direct audio URL (must end with .mp3, .m4a, .wav, etc.)");
+      return;
+    }
+    if (!audioTitle.trim()) return toast.error("Title is required");
+    setAudioSaving(true);
+    const { error } = await supabase.from("shared_resources").insert({
+      user_id: user.id,
+      title: audioTitle.trim(),
+      author: audioAuthor.trim() || "Quran PathWay",
+      type: "audio",
+      category: audioCategory,
+      external_url: url,
+      embed_provider: "direct-audio",
+      file_path: null,
+    });
+    setAudioSaving(false);
+    if (error) return toast.error(error.message);
+    toast.success("Audio added");
+    setAudioUrl(""); setAudioTitle("");
+    qc.invalidateQueries({ queryKey: ["admin-resources"] });
+    qc.invalidateQueries({ queryKey: ["resources"] });
+  };
+
+  const handleBulkAudio = async () => {
+    if (!user) return;
+    const lines = bulkAudio.split("\n").map((l) => l.trim()).filter(Boolean);
+    const rows = lines
+      .map((line) => {
+        // Accept either "Title || URL" or just a URL
+        const parts = line.split("||").map((s) => s.trim());
+        let url = "", title = "";
+        if (parts.length >= 2) {
+          // find the part that looks like a URL
+          const urlPart = parts.find((p) => isLikelyAudioUrl(p));
+          if (!urlPart) return null;
+          url = urlPart;
+          title = parts.find((p) => p !== urlPart && p.length > 0) || urlPart.split("/").pop() || "Audio";
+        } else {
+          // try to extract URL from the line
+          const m = line.match(/https?:\/\/\S+\.(?:mp3|m4a|wav|ogg|aac|opus)/i);
+          if (!m) return null;
+          url = m[0];
+          title = line.replace(url, "").trim() || url.split("/").pop() || "Audio";
+        }
+        return {
+          user_id: user.id,
+          title,
+          author: "Quran PathWay",
+          type: "audio",
+          category: "Quran",
+          external_url: url,
+          embed_provider: "direct-audio",
+          file_path: null,
+        };
+      })
+      .filter(Boolean) as any[];
+
+    if (rows.length === 0) return toast.error("No valid audio URLs found");
+    setBulkSaving(true);
+    const { error } = await supabase.from("shared_resources").insert(rows);
+    setBulkSaving(false);
+    if (error) return toast.error(error.message);
+    toast.success(`Added ${rows.length} audio resource${rows.length === 1 ? "" : "s"}`);
+    setBulkAudio("");
+    qc.invalidateQueries({ queryKey: ["admin-resources"] });
+    qc.invalidateQueries({ queryKey: ["resources"] });
+  };
+
   const remove = async (id: string, file_path: string | null) => {
     if (!confirm("Delete this resource permanently?")) return;
     if (file_path) {
