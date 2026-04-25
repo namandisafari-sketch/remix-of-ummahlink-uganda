@@ -224,7 +224,7 @@ const AuthPage = () => {
                             id="displayName"
                             value={displayName}
                             onChange={(e) => setDisplayName(e.target.value)}
-                            placeholder="e.g. Aisha Nakato"
+                            placeholder="e.g. Aisha Nakato" className="placeholder-elegant"
                             maxLength={80}
                           />
                         </div>
@@ -235,7 +235,7 @@ const AuthPage = () => {
                             type="tel"
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
-                            placeholder="+256 7XX XXX XXX"
+                            placeholder="+256 7XX XXX XXX" className="placeholder-elegant"
                             maxLength={20}
                           />
                         </div>
@@ -246,7 +246,7 @@ const AuthPage = () => {
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            placeholder="you@example.com"
+                            placeholder="you@example.com" className="placeholder-elegant"
                           />
                         </div>
                       </>
@@ -261,7 +261,7 @@ const AuthPage = () => {
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            placeholder="At least 8 characters"
+                            placeholder="At least 8 characters" className="placeholder-elegant"
                             minLength={8}
                           />
                           {password && (
@@ -306,7 +306,7 @@ const AuthPage = () => {
                             type="password"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
-                            placeholder="Re-enter password"
+                            placeholder="Re-enter password" className="placeholder-elegant"
                           />
                           {confirmPassword && password !== confirmPassword && (
                             <p className="mt-1 text-xs text-destructive">Passwords don't match</p>
@@ -324,7 +324,7 @@ const AuthPage = () => {
                               id="city"
                               value={city}
                               onChange={(e) => setCity(e.target.value)}
-                              placeholder="Kampala"
+                              placeholder="Kampala" className="placeholder-elegant"
                               maxLength={80}
                             />
                           </div>
@@ -334,7 +334,7 @@ const AuthPage = () => {
                               id="mosque"
                               value={preferredMosque}
                               onChange={(e) => setPreferredMosque(e.target.value)}
-                              placeholder="e.g. Kibuli"
+                              placeholder="e.g. Kibuli" className="placeholder-elegant"
                               maxLength={100}
                             />
                           </div>
