@@ -270,6 +270,10 @@ const AuthPage = () => {
                     )}
 
                     {step === 2 && (
+                      <AddressPicker value={address} onChange={setAddress} />
+                    )}
+
+                    {step === 3 && (
                       <>
                         <div>
                           <Label htmlFor="password">Password</Label>
@@ -332,7 +336,7 @@ const AuthPage = () => {
                       </>
                     )}
 
-                    {step === 3 && (
+                    {step === 4 && (
                       <>
                         <div className="grid grid-cols-2 gap-3">
                           <div>
