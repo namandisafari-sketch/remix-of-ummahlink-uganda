@@ -73,10 +73,26 @@ const AuthPage = () => {
   };
 
   const canProceed = () => {
-    if (step === 1) return displayName.trim().length >= 2 && phone.trim().length >= 7 && /^\S+@\S+\.\S+$/.test(email);
+    if (step === 1) return displayName.trim().length >= 2 && UG_PHONE_RE.test(phone.trim()) && EMAIL_RE.test(email.trim());
     if (step === 2) return !!address.region && !!address.district && !!address.constituency && !!address.subcounty && !!address.parish;
     if (step === 3) return pwValid && password === confirmPassword;
     return true;
+  };
+
+  const handleGoogle = async () => {
+    setLoading(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
+      if (result.error) {
+        toast.error(result.error.message || "Google sign-in failed");
+        setLoading(false);
+        return;
+      }
+      // result.redirected handled by browser navigation; OnboardingGate enforces address step
+    } catch (err: any) {
+      toast.error(err?.message || "Google sign-in failed");
+      setLoading(false);
+    }
   };
 
   const handleSignIn = async (e: React.FormEvent) => {
