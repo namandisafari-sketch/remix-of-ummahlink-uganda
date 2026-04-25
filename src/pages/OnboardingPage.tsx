@@ -109,39 +109,51 @@ const OnboardingPage = () => {
   };
 
   const canProceed = () => {
-    if (step === 1) return !!referralSource && !!ageRange;
-    if (step === 2) return hobbies.length > 0;
-    if (step === 3) return interests.length > 0;
-    if (step === 4) return !!accountPurpose;
-    if (step === 5) return accountPurpose === "experience" || (!!businessName && !!businessCategory);
+    if (step === 1) {
+      return UG_PHONE_RE.test(phone.trim()) &&
+        !!address.region && !!address.district && !!address.constituency &&
+        !!address.subcounty && !!address.parish;
+    }
+    if (step === 2) return !!referralSource && !!ageRange;
+    if (step === 3) return hobbies.length > 0;
+    if (step === 4) return interests.length > 0;
+    if (step === 5) return !!accountPurpose;
+    if (step === 6) return accountPurpose === "experience" || (!!businessName && !!businessCategory);
     return false;
   };
 
   const handleNext = () => {
-    if (step === 4 && accountPurpose === "experience") return handleSubmit();
+    if (step === 5 && accountPurpose === "experience") return handleSubmit();
     if (step < TOTAL_STEPS) setStep(step + 1);
     else handleSubmit();
   };
 
-  const handleSkip = async () => {
-    if (!user) return;
-    setSubmitting(true);
-    await supabase.from("user_preferences").upsert(
-      { user_id: user.id, onboarding_completed: true, onboarding_completed_at: new Date().toISOString() },
-      { onConflict: "user_id" }
-    );
-    navigate("/", { replace: true });
-  };
-
   const handleSubmit = async () => {
     if (!user) return;
+    const normalizedPhone = normalizeUgPhone(phone);
+    if (!normalizedPhone) {
+      toast.error("Enter a valid Ugandan phone number");
+      setStep(1);
+      return;
+    }
     setSubmitting(true);
+    // Save phone on profile
+    await supabase.from("profiles").upsert(
+      { user_id: user.id, phone: normalizedPhone },
+      { onConflict: "user_id" }
+    );
     const { error } = await supabase.from("user_preferences").upsert(
       {
         user_id: user.id,
+        region: address.region || null,
+        district: address.district || null,
+        constituency: address.constituency || null,
+        subcounty: address.subcounty || null,
+        parish: address.parish || null,
+        village: address.village || null,
         referral_source: referralSource || null,
         age_range: ageRange || null,
-        location_city: locationCity.trim() || null,
+        location_city: locationCity.trim() || address.district || null,
         hobbies,
         interests,
         account_purpose: accountPurpose || null,
