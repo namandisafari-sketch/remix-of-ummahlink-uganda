@@ -42,15 +42,14 @@ export const OperatorApply = () => {
     queryKey: ["my-operator-application", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("operator_applications")
+      const { data, error } = await (supabase.from("operator_applications") as any)
         .select("*")
         .eq("user_id", user!.id)
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
       if (error) throw error;
-      return data;
+      return data as any;
     },
   });
 
@@ -61,7 +60,7 @@ export const OperatorApply = () => {
       return;
     }
     setSubmitting(true);
-    const { error } = await supabase.from("operator_applications").insert({
+    const { error } = await (supabase.from("operator_applications") as any).insert({
       user_id: user!.id,
       ...parsed.data,
     });
