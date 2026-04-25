@@ -180,6 +180,7 @@ const AdminResources = () => {
           external_url: url,
           embed_provider: "direct-audio",
           file_path: null,
+          reciter_scope: reciterScope,
         };
       })
       .filter(Boolean) as any[];
