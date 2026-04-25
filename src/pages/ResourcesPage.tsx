@@ -279,6 +279,7 @@ const ResourcesPage = () => {
                         </Button>
                       </a>
                     )}
+                    <ResourceInteractions resourceId={resource.id} />
                   </CardContent>
                 </Card>
               </motion.div>
