@@ -211,41 +211,52 @@ const ResourcesPage = () => {
                       />
                     </div>
                   )}
-                  <CardContent className="flex h-full flex-col p-5">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${typeColors[resource.type] || "bg-muted"}`}>
+                  <CardContent className="flex h-full flex-col p-4">
+                    <div className="flex items-start gap-3">
+                      <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${typeColors[resource.type] || "bg-muted"}`}>
                         <Icon className="h-5 w-5" />
                       </div>
-                      <Badge variant="secondary" className="text-xs">
+                      <div className="min-w-0 flex-1">
+                        <h3 className="line-clamp-2 font-semibold leading-snug text-foreground">{resource.title}</h3>
+                        <p className="mt-0.5 truncate text-xs text-muted-foreground">by {resource.author}</p>
+                      </div>
+                      <Badge variant="secondary" className="shrink-0 text-[10px]">
                         {resource.type.toUpperCase()}
                       </Badge>
                     </div>
-                    <h3 className="mt-3 font-semibold text-foreground leading-snug">{resource.title}</h3>
-                    <p className="mt-1 text-sm text-muted-foreground">by {resource.author}</p>
-                    <div className="mt-auto flex items-center justify-between pt-4 text-xs text-muted-foreground">
-                      <span>{resource.category}{resource.file_size ? ` • ${resource.file_size}` : ""}</span>
-                      <span>{isVideo ? `${resource.downloads} views` : `${resource.downloads} ${isExternalAudio ? "plays" : "downloads"}`}</span>
+
+                    {isExternalAudio && (
+                      <div className="mt-3">
+                        <AudioPlayer
+                          src={resource.external_url}
+                          onFirstPlay={() => {
+                            supabase.rpc("increment_download_count", { resource_id: resource.id });
+                          }}
+                        />
+                      </div>
+                    )}
+
+                    <div className="mt-3 flex items-center justify-between text-[11px] text-muted-foreground">
+                      <span className="truncate">
+                        {resource.category}
+                        {resource.file_size ? ` • ${resource.file_size}` : ""}
+                      </span>
+                      <span className="shrink-0">
+                        {resource.downloads} {isVideo ? "views" : isExternalAudio ? "plays" : "downloads"}
+                      </span>
                     </div>
-                    {isExternalAudio ? (
-                      <audio
-                        controls
-                        preload="none"
-                        src={resource.external_url}
-                        className="mt-3 w-full"
-                        onPlay={() => {
-                          supabase.rpc("increment_download_count", { resource_id: resource.id });
-                        }}
-                      />
-                    ) : isVideo ? (
+
+                    {!isExternalAudio && !isVideo && (
+                      <Button variant="outline" size="sm" className="mt-3 w-full gap-2" onClick={() => handleDownload(resource)}>
+                        <Download className="h-4 w-4" /> Download
+                      </Button>
+                    )}
+                    {isVideo && (
                       <a href={resource.external_url} target="_blank" rel="noopener noreferrer" className="mt-3">
                         <Button variant="outline" size="sm" className="w-full gap-2">
                           <ExternalLink className="h-4 w-4" /> Open on TikTok
                         </Button>
                       </a>
-                    ) : (
-                      <Button variant="outline" size="sm" className="mt-3 w-full gap-2" onClick={() => handleDownload(resource)}>
-                        <Download className="h-4 w-4" /> Download
-                      </Button>
                     )}
                   </CardContent>
                 </Card>
