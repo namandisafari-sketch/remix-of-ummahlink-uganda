@@ -25,7 +25,8 @@ const AuthPage = () => {
     try {
       if (isSignUp) {
         await signUp(email, password, displayName);
-        toast.success("Account created! Check your email to confirm.");
+        toast.success("Account created! Let's personalize your experience.");
+        navigate("/onboarding");
       } else {
         await signIn(email, password);
         toast.success("Welcome back!");
