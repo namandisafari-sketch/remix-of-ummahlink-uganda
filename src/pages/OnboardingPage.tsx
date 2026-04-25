@@ -53,7 +53,7 @@ const BUSINESS_CATEGORIES = [
 
 const AGE_RANGES = ["Under 18", "18-24", "25-34", "35-44", "45-54", "55+"];
 
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 6;
 
 const OnboardingPage = () => {
   const { user, loading: authLoading } = useAuth();
@@ -62,6 +62,8 @@ const OnboardingPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [checking, setChecking] = useState(true);
 
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState<AddressValue>(emptyAddress);
   const [referralSource, setReferralSource] = useState("");
   const [ageRange, setAgeRange] = useState("");
   const [locationCity, setLocationCity] = useState("");
@@ -79,16 +81,26 @@ const OnboardingPage = () => {
       return;
     }
     (async () => {
-      const { data } = await supabase
-        .from("user_preferences")
-        .select("onboarding_completed")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      if (data?.onboarding_completed) {
+      const [{ data: pref }, { data: prof }] = await Promise.all([
+        supabase.from("user_preferences").select("onboarding_completed, region, district, constituency, subcounty, parish, village").eq("user_id", user.id).maybeSingle(),
+        supabase.from("profiles").select("phone").eq("user_id", user.id).maybeSingle(),
+      ]);
+      if (pref?.onboarding_completed) {
         navigate("/", { replace: true });
-      } else {
-        setChecking(false);
+        return;
       }
+      if (prof?.phone) setPhone(prof.phone);
+      if (pref?.region) {
+        setAddress({
+          region: pref.region || "",
+          district: pref.district || "",
+          constituency: pref.constituency || "",
+          subcounty: pref.subcounty || "",
+          parish: pref.parish || "",
+          village: pref.village || "",
+        });
+      }
+      setChecking(false);
     })();
   }, [user, authLoading, navigate]);
 
