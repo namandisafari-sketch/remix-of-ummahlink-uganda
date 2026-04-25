@@ -15,20 +15,30 @@ import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
-type ResourceType = "pdf" | "audio" | "guide";
+type ResourceType = "pdf" | "audio" | "guide" | "video";
 
-const categories = ["All", "Fiqh", "Quran", "Hadith", "History", "Arabic", "Youth"];
+const categories = ["All", "Quran", "Fiqh", "Hadith", "History", "Arabic", "Youth"];
 
 const typeIcons: Record<string, typeof FileText> = {
   pdf: FileText,
   audio: Headphones,
   guide: BookOpen,
+  video: Video,
 };
 
 const typeColors: Record<string, string> = {
   pdf: "bg-primary/10 text-primary",
   audio: "bg-accent/20 text-accent-foreground",
   guide: "bg-emerald-light text-foreground",
+  video: "bg-destructive/10 text-destructive",
+};
+
+// Build a TikTok embed URL from any TikTok video URL
+const tiktokEmbedUrl = (url: string): string | null => {
+  // Match https://www.tiktok.com/@user/video/123 or https://vm.tiktok.com/...
+  const m = url.match(/\/video\/(\d+)/);
+  if (m) return `https://www.tiktok.com/embed/v2/${m[1]}`;
+  return null;
 };
 
 const ResourcesPage = () => {
