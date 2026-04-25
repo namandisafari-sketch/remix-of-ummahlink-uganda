@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   Shield, Landmark, Bell, DollarSign, Loader2, Megaphone, Mic, Users,
-  BookOpen, Settings, LayoutDashboard, MapPin, Inbox, Tv, Menu,
+  BookOpen, Settings, LayoutDashboard, MapPin, Inbox, Tv, Menu, Plane,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
@@ -22,11 +22,12 @@ import AdminMosques from "@/components/admin/AdminMosques";
 import AdminSubmissions from "@/components/admin/AdminSubmissions";
 import AdminTv from "@/components/admin/AdminTv";
 import AdminSettings from "@/components/admin/AdminSettings";
+import AdminTours from "@/components/admin/AdminTours";
 
 type SectionKey =
   | "dashboard" | "banners" | "projects" | "alerts" | "donations"
   | "sheikhs" | "tv" | "mosques" | "submissions" | "resources"
-  | "users" | "settings";
+  | "users" | "settings" | "tours";
 
 const NAV: { key: SectionKey; label: string; icon: typeof Bell; group: string }[] = [
   { key: "dashboard", label: "Overview", icon: LayoutDashboard, group: "Insights" },
@@ -35,6 +36,7 @@ const NAV: { key: SectionKey; label: string; icon: typeof Bell; group: string }[
   { key: "resources", label: "Library", icon: BookOpen, group: "Content" },
   { key: "tv", label: "TV", icon: Tv, group: "Content" },
   { key: "sheikhs", label: "Sheikhs", icon: Mic, group: "Content" },
+  { key: "tours", label: "Hajj & Umrah", icon: Plane, group: "Community" },
   { key: "projects", label: "Projects", icon: Landmark, group: "Community" },
   { key: "donations", label: "Donations", icon: DollarSign, group: "Community" },
   { key: "alerts", label: "Alerts", icon: Bell, group: "Community" },
@@ -50,6 +52,7 @@ const SECTIONS: Record<SectionKey, { title: string; subtitle: string; render: ()
   resources:   { title: "Library",        subtitle: "Audios, videos & document insights",    render: () => <AdminResources /> },
   tv:          { title: "TV",             subtitle: "Live streams & on-demand video",        render: () => <AdminTv /> },
   sheikhs:     { title: "Sheikhs",        subtitle: "Curate the Dawah directory",            render: () => <AdminSheikhs /> },
+  tours:       { title: "Hajj & Umrah",   subtitle: "Tour operators, packages & inquiries",  render: () => <AdminTours /> },
   projects:    { title: "Projects",       subtitle: "Mosque fundraising goals",              render: () => <AdminProjects /> },
   donations:   { title: "Donations",      subtitle: "Track & verify Pesapal transactions",   render: () => <AdminDonations /> },
   alerts:      { title: "Alerts",         subtitle: "Moderate Janaza & SOS posts",           render: () => <AdminAlerts /> },
