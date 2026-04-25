@@ -23,6 +23,15 @@ interface Props {
   resourceId: string;
 }
 
+const resolveName = (name: string | null | undefined, userId: string): string => {
+  const trimmed = (name || "").trim();
+  if (trimmed) {
+    // If it's an email, show only the part before @
+    return trimmed.includes("@") ? trimmed.split("@")[0] : trimmed;
+  }
+  return `User ${userId.slice(0, 6)}`;
+};
+
 export const ResourceInteractions = ({ resourceId }: Props) => {
   const { user } = useAuth();
   const { isAdmin } = useIsAdmin();
