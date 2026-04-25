@@ -303,21 +303,29 @@ const AuthPage = () => {
                           <Input
                             id="phone"
                             type="tel"
+                            inputMode="tel"
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
                             placeholder="+256 7XX XXX XXX" className="placeholder-elegant"
                             maxLength={20}
                           />
+                          {phone && !UG_PHONE_RE.test(phone.trim()) && (
+                            <p className="mt-1 text-xs text-destructive">Use a valid Uganda mobile number, e.g. +256 7XX XXX XXX</p>
+                          )}
                         </div>
                         <div>
                           <Label htmlFor="email">Email</Label>
                           <Input
                             id="email"
                             type="email"
+                            inputMode="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="you@example.com" className="placeholder-elegant"
                           />
+                          {email && !EMAIL_RE.test(email.trim()) && (
+                            <p className="mt-1 text-xs text-destructive">Enter a valid email like name@example.com</p>
+                          )}
                         </div>
                       </>
                     )}
