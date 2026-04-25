@@ -189,6 +189,7 @@ const ResourcesPage = () => {
             const Icon = typeIcons[resource.type] || FileText;
             const isVideo = resource.type === "video" && resource.external_url;
             const embedUrl = isVideo ? tiktokEmbedUrl(resource.external_url) : null;
+            const isExternalAudio = resource.type === "audio" && isDirectAudioUrl(resource.external_url);
             return (
               <motion.div
                 key={resource.id}
@@ -222,9 +223,19 @@ const ResourcesPage = () => {
                     <p className="mt-1 text-sm text-muted-foreground">by {resource.author}</p>
                     <div className="mt-auto flex items-center justify-between pt-4 text-xs text-muted-foreground">
                       <span>{resource.category}{resource.file_size ? ` • ${resource.file_size}` : ""}</span>
-                      <span>{isVideo ? `${resource.downloads} views` : `${resource.downloads} downloads`}</span>
+                      <span>{isVideo ? `${resource.downloads} views` : `${resource.downloads} ${isExternalAudio ? "plays" : "downloads"}`}</span>
                     </div>
-                    {isVideo ? (
+                    {isExternalAudio ? (
+                      <audio
+                        controls
+                        preload="none"
+                        src={resource.external_url}
+                        className="mt-3 w-full"
+                        onPlay={() => {
+                          supabase.rpc("increment_download_count", { resource_id: resource.id });
+                        }}
+                      />
+                    ) : isVideo ? (
                       <a href={resource.external_url} target="_blank" rel="noopener noreferrer" className="mt-3">
                         <Button variant="outline" size="sm" className="w-full gap-2">
                           <ExternalLink className="h-4 w-4" /> Open on TikTok
