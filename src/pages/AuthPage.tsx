@@ -100,7 +100,11 @@ const AuthPage = () => {
         await supabase.from("user_preferences").upsert(
           {
             user_id: user.id,
-            location_city: city.trim() || null,
+            location_city: city.trim() || address.district || null,
+            region: address.region || null,
+            district: address.district || null,
+            constituency: address.constituency || null,
+            street_address: address.street.trim() || null,
             interests,
             business_description: preferredMosque.trim() ? `Preferred mosque: ${preferredMosque.trim()}` : null,
           },
@@ -124,8 +128,9 @@ const AuthPage = () => {
 
   const stepMeta = [
     { n: 1, label: "Identity" },
-    { n: 2, label: "Security" },
-    { n: 3, label: "Interests" },
+    { n: 2, label: "Address" },
+    { n: 3, label: "Security" },
+    { n: 4, label: "Interests" },
   ];
 
   return (
@@ -141,6 +146,8 @@ const AuthPage = () => {
                 : step === 1
                 ? "Join UmmahLink"
                 : step === 2
+                ? "Your full address"
+                : step === 3
                 ? "Secure your account"
                 : "Personalize"}
             </CardTitle>
@@ -150,6 +157,8 @@ const AuthPage = () => {
                 : step === 1
                 ? "Tell us who you are"
                 : step === 2
+                ? "Region, district & constituency in Uganda"
+                : step === 3
                 ? "Choose a strong password"
                 : "Help us tailor your experience"}
             </CardDescription>
