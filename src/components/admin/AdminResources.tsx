@@ -46,6 +46,15 @@ const AdminResources = () => {
   const [fetching, setFetching] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  // Direct audio link state
+  const [audioUrl, setAudioUrl] = useState("");
+  const [audioTitle, setAudioTitle] = useState("");
+  const [audioAuthor, setAudioAuthor] = useState("Quran PathWay");
+  const [audioCategory, setAudioCategory] = useState("Quran");
+  const [audioSaving, setAudioSaving] = useState(false);
+  const [bulkAudio, setBulkAudio] = useState("");
+  const [bulkSaving, setBulkSaving] = useState(false);
+
   const { data, isLoading } = useQuery({
     queryKey: ["admin-resources"],
     queryFn: async () => {
