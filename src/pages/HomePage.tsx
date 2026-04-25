@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Bell, Heart, BookOpen, ArrowRight, Mic, MapPin, Sparkles, Calendar, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import HeroBanner from "@/components/HeroBanner";
+import HomeUrgentBanner from "@/components/notifications/HomeUrgentBanner";
 import { useAuth } from "@/contexts/AuthContext";
 
 const quickActions = [
@@ -78,6 +79,11 @@ const HomePage = () => {
             <Calendar className="h-5 w-5" />
           </div>
         </div>
+      </section>
+
+      {/* Urgent imam notification banner */}
+      <section className="px-4 pt-3 md:px-6">
+        <HomeUrgentBanner />
       </section>
 
       {/* Hero (slimmer on mobile) */}
