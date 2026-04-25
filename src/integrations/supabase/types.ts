@@ -573,6 +573,63 @@ export type Database = {
         }
         Relationships: []
       }
+      user_preferences: {
+        Row: {
+          account_purpose: string | null
+          age_range: string | null
+          business_category: string | null
+          business_description: string | null
+          business_name: string | null
+          created_at: string
+          has_business: boolean
+          hobbies: string[] | null
+          id: string
+          interests: string[] | null
+          location_city: string | null
+          onboarding_completed: boolean
+          onboarding_completed_at: string | null
+          referral_source: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_purpose?: string | null
+          age_range?: string | null
+          business_category?: string | null
+          business_description?: string | null
+          business_name?: string | null
+          created_at?: string
+          has_business?: boolean
+          hobbies?: string[] | null
+          id?: string
+          interests?: string[] | null
+          location_city?: string | null
+          onboarding_completed?: boolean
+          onboarding_completed_at?: string | null
+          referral_source?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_purpose?: string | null
+          age_range?: string | null
+          business_category?: string | null
+          business_description?: string | null
+          business_name?: string | null
+          created_at?: string
+          has_business?: boolean
+          hobbies?: string[] | null
+          id?: string
+          interests?: string[] | null
+          location_city?: string | null
+          onboarding_completed?: boolean
+          onboarding_completed_at?: string | null
+          referral_source?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string

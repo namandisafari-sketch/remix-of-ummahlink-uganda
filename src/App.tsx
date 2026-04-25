@@ -8,6 +8,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import MobileHeader from "@/components/MobileHeader";
 import BottomNav from "@/components/BottomNav";
 import PrayerPrompt from "@/components/PrayerPrompt";
+import OnboardingGate from "@/components/OnboardingGate";
+import OnboardingPage from "@/pages/OnboardingPage";
 import HomePage from "@/pages/HomePage";
 import AlertsPage from "@/pages/AlertsPage";
 import DonationsPage from "@/pages/DonationsPage";
@@ -30,6 +32,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <OnboardingGate />
             <div className="mx-auto flex min-h-screen max-w-md flex-col bg-calm shadow-xl sm:max-w-2xl md:max-w-4xl lg:max-w-6xl xl:max-w-7xl sm:shadow-none">
               <MobileHeader />
               <main className="flex-1 pb-20 md:pb-8">
@@ -43,6 +46,7 @@ const App = () => (
                   <Route path="/tv" element={<TvPage />} />
                   <Route path="/more" element={<MorePage />} />
                   <Route path="/auth" element={<AuthPage />} />
+                  <Route path="/onboarding" element={<OnboardingPage />} />
                   <Route path="/admin" element={<AdminPage />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
