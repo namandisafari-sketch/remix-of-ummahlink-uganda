@@ -105,7 +105,7 @@ export const ResourceInteractions = ({ resourceId }: Props) => {
             .select("display_name")
             .eq("user_id", c.user_id)
             .maybeSingle();
-          c.author_name = prof?.display_name || "Anonymous";
+          c.author_name = resolveName(prof?.display_name, c.user_id);
           setComments((prev) => (prev.find((x) => x.id === c.id) ? prev : [c, ...prev]));
         }
       )
