@@ -8,6 +8,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import MobileHeader from "@/components/MobileHeader";
 import BottomNav from "@/components/BottomNav";
 import PrayerPrompt from "@/components/PrayerPrompt";
+import OnboardingGate from "@/components/OnboardingGate";
+import OnboardingPage from "@/pages/OnboardingPage";
 import HomePage from "@/pages/HomePage";
 import AlertsPage from "@/pages/AlertsPage";
 import DonationsPage from "@/pages/DonationsPage";
