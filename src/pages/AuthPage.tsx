@@ -11,13 +11,14 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { LogIn, UserPlus, Check, ArrowLeft, ArrowRight, ShieldCheck, ShieldAlert } from "lucide-react";
 import logo from "@/assets/logo.svg";
+import { AddressPicker, type AddressValue } from "@/components/AddressPicker";
 
 const INTERESTS = [
   "Daily reminders", "Live lectures", "Quran tafsir", "Charity & sadaqah",
   "Mosque events", "Halal businesses", "Education", "Family & parenting",
 ];
 
-const TOTAL_STEPS = 3;
+const TOTAL_STEPS = 4;
 
 const scorePassword = (pw: string) => {
   let score = 0;
@@ -42,6 +43,12 @@ const AuthPage = () => {
   const [phone, setPhone] = useState("");
   const [city, setCity] = useState("");
   const [preferredMosque, setPreferredMosque] = useState("");
+  const [address, setAddress] = useState<AddressValue>({
+    region: "",
+    district: "",
+    constituency: "",
+    street: "",
+  });
   const [interests, setInterests] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const { signIn, signUp } = useAuth();
@@ -61,7 +68,8 @@ const AuthPage = () => {
 
   const canProceed = () => {
     if (step === 1) return displayName.trim().length >= 2 && phone.trim().length >= 7 && /^\S+@\S+\.\S+$/.test(email);
-    if (step === 2) return pwValid && password === confirmPassword;
+    if (step === 2) return !!address.region && !!address.district && !!address.constituency;
+    if (step === 3) return pwValid && password === confirmPassword;
     return true;
   };
 
