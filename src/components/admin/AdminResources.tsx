@@ -110,6 +110,7 @@ const AdminResources = () => {
       embed_provider: "tiktok",
       thumbnail_url: tiktokThumb || null,
       file_path: null,
+      reciter_scope: reciterScope,
     });
     setSaving(false);
     if (error) return toast.error(error.message);
