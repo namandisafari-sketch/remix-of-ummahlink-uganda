@@ -97,9 +97,13 @@ const AuthPage = () => {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!EMAIL_RE.test(email.trim())) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
     setLoading(true);
     try {
-      await signIn(email, password);
+      await signIn(email.trim(), password);
       toast.success("Welcome back!");
       navigate("/");
     } catch (err: any) {
