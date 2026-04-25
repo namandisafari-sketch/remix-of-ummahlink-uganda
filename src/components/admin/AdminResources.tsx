@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Trash2, Download, FileText, Plus, ExternalLink, Video, Headphones } from "lucide-react";
+import { Loader2, Trash2, Download, FileText, Plus, ExternalLink, Video, Headphones, Heart, MessageSquare, TrendingUp, Library } from "lucide-react";
 import { toast } from "sonner";
 
 const QURAN_CATEGORIES = ["Quran", "Fiqh", "Hadith", "History", "Arabic", "Youth"];
@@ -67,6 +67,40 @@ const AdminResources = () => {
       return data;
     },
   });
+
+  // Insights: likes & comments per resource
+  const { data: engagement } = useQuery({
+    queryKey: ["admin-resource-engagement"],
+    queryFn: async () => {
+      const [{ data: likes }, { data: comments }] = await Promise.all([
+        supabase.from("resource_likes").select("resource_id"),
+        supabase.from("resource_comments").select("resource_id"),
+      ]);
+      const likeMap = new Map<string, number>();
+      const commentMap = new Map<string, number>();
+      (likes ?? []).forEach((l: any) => likeMap.set(l.resource_id, (likeMap.get(l.resource_id) ?? 0) + 1));
+      (comments ?? []).forEach((c: any) => commentMap.set(c.resource_id, (commentMap.get(c.resource_id) ?? 0) + 1));
+      return { likeMap, commentMap, totalLikes: likes?.length ?? 0, totalComments: comments?.length ?? 0 };
+    },
+  });
+
+  const insights = (() => {
+    if (!data) return null;
+    const totalDownloads = data.reduce((s: number, r: any) => s + (r.downloads || 0), 0);
+    const byType = data.reduce((acc: Record<string, number>, r: any) => {
+      const k = r.type === "pdf" || r.type === "guide" ? "text" : r.type;
+      acc[k] = (acc[k] ?? 0) + 1;
+      return acc;
+    }, {});
+    const enriched = data.map((r: any) => ({
+      ...r,
+      _likes: engagement?.likeMap.get(r.id) ?? 0,
+      _comments: engagement?.commentMap.get(r.id) ?? 0,
+      _score: (r.downloads || 0) + (engagement?.likeMap.get(r.id) ?? 0) * 3 + (engagement?.commentMap.get(r.id) ?? 0) * 2,
+    }));
+    const top = [...enriched].sort((a, b) => b._score - a._score).slice(0, 5);
+    return { totalDownloads, byType, top, enriched };
+  })();
 
   const handleFetchMeta = async () => {
     const url = tiktokUrl.trim();
