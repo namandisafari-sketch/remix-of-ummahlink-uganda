@@ -14,6 +14,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ArrowLeft, ArrowRight, Sparkles, Check } from "lucide-react";
 import logo from "@/assets/logo.svg";
+import { AddressPicker, emptyAddress, type AddressValue } from "@/components/AddressPicker";
+
+const UG_PHONE_RE = /^(?:\+?256|0)?7\d{8}$/;
+const normalizeUgPhone = (raw: string) => {
+  const digits = raw.replace(/[^\d+]/g, "");
+  const m = digits.match(/^(?:\+?256|0)?(7\d{8})$/);
+  return m ? `+256${m[1]}` : null;
+};
 
 const REFERRAL_SOURCES = [
   "Friend or family",
@@ -45,7 +53,7 @@ const BUSINESS_CATEGORIES = [
 
 const AGE_RANGES = ["Under 18", "18-24", "25-34", "35-44", "45-54", "55+"];
 
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 6;
 
 const OnboardingPage = () => {
   const { user, loading: authLoading } = useAuth();
@@ -54,6 +62,8 @@ const OnboardingPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [checking, setChecking] = useState(true);
 
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState<AddressValue>(emptyAddress);
   const [referralSource, setReferralSource] = useState("");
   const [ageRange, setAgeRange] = useState("");
   const [locationCity, setLocationCity] = useState("");
@@ -71,16 +81,26 @@ const OnboardingPage = () => {
       return;
     }
     (async () => {
-      const { data } = await supabase
-        .from("user_preferences")
-        .select("onboarding_completed")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      if (data?.onboarding_completed) {
+      const [{ data: pref }, { data: prof }] = await Promise.all([
+        supabase.from("user_preferences").select("onboarding_completed, region, district, constituency, subcounty, parish, village").eq("user_id", user.id).maybeSingle(),
+        supabase.from("profiles").select("phone").eq("user_id", user.id).maybeSingle(),
+      ]);
+      if (pref?.onboarding_completed) {
         navigate("/", { replace: true });
-      } else {
-        setChecking(false);
+        return;
       }
+      if (prof?.phone) setPhone(prof.phone);
+      if (pref?.region) {
+        setAddress({
+          region: pref.region || "",
+          district: pref.district || "",
+          constituency: pref.constituency || "",
+          subcounty: pref.subcounty || "",
+          parish: pref.parish || "",
+          village: pref.village || "",
+        });
+      }
+      setChecking(false);
     })();
   }, [user, authLoading, navigate]);
 
@@ -89,39 +109,51 @@ const OnboardingPage = () => {
   };
 
   const canProceed = () => {
-    if (step === 1) return !!referralSource && !!ageRange;
-    if (step === 2) return hobbies.length > 0;
-    if (step === 3) return interests.length > 0;
-    if (step === 4) return !!accountPurpose;
-    if (step === 5) return accountPurpose === "experience" || (!!businessName && !!businessCategory);
+    if (step === 1) {
+      return UG_PHONE_RE.test(phone.trim()) &&
+        !!address.region && !!address.district && !!address.constituency &&
+        !!address.subcounty && !!address.parish;
+    }
+    if (step === 2) return !!referralSource && !!ageRange;
+    if (step === 3) return hobbies.length > 0;
+    if (step === 4) return interests.length > 0;
+    if (step === 5) return !!accountPurpose;
+    if (step === 6) return accountPurpose === "experience" || (!!businessName && !!businessCategory);
     return false;
   };
 
   const handleNext = () => {
-    if (step === 4 && accountPurpose === "experience") return handleSubmit();
+    if (step === 5 && accountPurpose === "experience") return handleSubmit();
     if (step < TOTAL_STEPS) setStep(step + 1);
     else handleSubmit();
   };
 
-  const handleSkip = async () => {
-    if (!user) return;
-    setSubmitting(true);
-    await supabase.from("user_preferences").upsert(
-      { user_id: user.id, onboarding_completed: true, onboarding_completed_at: new Date().toISOString() },
-      { onConflict: "user_id" }
-    );
-    navigate("/", { replace: true });
-  };
-
   const handleSubmit = async () => {
     if (!user) return;
+    const normalizedPhone = normalizeUgPhone(phone);
+    if (!normalizedPhone) {
+      toast.error("Enter a valid Ugandan phone number");
+      setStep(1);
+      return;
+    }
     setSubmitting(true);
+    // Save phone on profile
+    await supabase.from("profiles").upsert(
+      { user_id: user.id, phone: normalizedPhone },
+      { onConflict: "user_id" }
+    );
     const { error } = await supabase.from("user_preferences").upsert(
       {
         user_id: user.id,
+        region: address.region || null,
+        district: address.district || null,
+        constituency: address.constituency || null,
+        subcounty: address.subcounty || null,
+        parish: address.parish || null,
+        village: address.village || null,
         referral_source: referralSource || null,
         age_range: ageRange || null,
-        location_city: locationCity.trim() || null,
+        location_city: locationCity.trim() || address.district || null,
         hobbies,
         interests,
         account_purpose: accountPurpose || null,
@@ -165,18 +197,20 @@ const OnboardingPage = () => {
             </div>
             <Progress value={progress} className="h-1.5" />
             <CardTitle className="font-display mt-3 text-xl">
-              {step === 1 && "Welcome! Tell us about you"}
-              {step === 2 && "What do you enjoy?"}
-              {step === 3 && "What interests you most?"}
-              {step === 4 && "Why are you joining?"}
-              {step === 5 && "Tell us about your business"}
+              {step === 1 && "Your address & phone"}
+              {step === 2 && "Welcome! Tell us about you"}
+              {step === 3 && "What do you enjoy?"}
+              {step === 4 && "What interests you most?"}
+              {step === 5 && "Why are you joining?"}
+              {step === 6 && "Tell us about your business"}
             </CardTitle>
             <CardDescription>
-              {step === 1 && "This helps us personalize your experience"}
-              {step === 2 && "Pick your hobbies — choose any that apply"}
-              {step === 3 && "We'll tailor content to what matters to you"}
-              {step === 4 && "We're building a community + simple ad service"}
-              {step === 5 && "We'll connect you with the right audience"}
+              {step === 1 && "Required so we can serve your community"}
+              {step === 2 && "This helps us personalize your experience"}
+              {step === 3 && "Pick your hobbies — choose any that apply"}
+              {step === 4 && "We'll tailor content to what matters to you"}
+              {step === 5 && "We're building a community + simple ad service"}
+              {step === 6 && "We'll connect you with the right audience"}
             </CardDescription>
           </CardHeader>
 
@@ -191,6 +225,29 @@ const OnboardingPage = () => {
                 className="space-y-4"
               >
                 {step === 1 && (
+                  <>
+                    <div>
+                      <Label htmlFor="ob-phone">Phone number</Label>
+                      <Input
+                        id="ob-phone"
+                        type="tel"
+                        inputMode="tel"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="+256 7XX XXX XXX"
+                        maxLength={20}
+                      />
+                      {phone && !UG_PHONE_RE.test(phone.trim()) && (
+                        <p className="mt-1 text-xs text-destructive">
+                          Use a valid Uganda mobile number, e.g. +256 7XX XXX XXX
+                        </p>
+                      )}
+                    </div>
+                    <AddressPicker value={address} onChange={setAddress} />
+                  </>
+                )}
+
+                {step === 2 && (
                   <>
                     <div className="space-y-2">
                       <Label>How did you find us?</Label>
@@ -231,7 +288,7 @@ const OnboardingPage = () => {
                   </>
                 )}
 
-                {step === 2 && (
+                {step === 3 && (
                   <div className="flex flex-wrap gap-2">
                     {HOBBIES.map((h) => {
                       const active = hobbies.includes(h);
@@ -254,7 +311,7 @@ const OnboardingPage = () => {
                   </div>
                 )}
 
-                {step === 3 && (
+                {step === 4 && (
                   <div className="space-y-2">
                     {INTERESTS.map((i) => {
                       const active = interests.includes(i);
@@ -274,7 +331,7 @@ const OnboardingPage = () => {
                   </div>
                 )}
 
-                {step === 4 && (
+                {step === 5 && (
                   <RadioGroup value={accountPurpose} onValueChange={(v) => setAccountPurpose(v as any)}>
                     <label className="flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors hover:bg-accent">
                       <RadioGroupItem value="experience" className="mt-1" />
@@ -297,7 +354,7 @@ const OnboardingPage = () => {
                   </RadioGroup>
                 )}
 
-                {step === 5 && (
+                {step === 6 && (
                   <>
                     <div>
                       <Label>Business name</Label>
@@ -338,13 +395,13 @@ const OnboardingPage = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => (step > 1 ? setStep(step - 1) : handleSkip())}
-                disabled={submitting}
+                onClick={() => step > 1 && setStep(step - 1)}
+                disabled={submitting || step === 1}
               >
-                {step > 1 ? <><ArrowLeft className="mr-1 h-4 w-4" /> Back</> : "Skip for now"}
+                <ArrowLeft className="mr-1 h-4 w-4" /> Back
               </Button>
               <Button onClick={handleNext} disabled={!canProceed() || submitting} className="gap-1">
-                {submitting ? "Saving..." : (step === TOTAL_STEPS || (step === 4 && accountPurpose === "experience")) ? "Finish" : <>Next <ArrowRight className="h-4 w-4" /></>}
+                {submitting ? "Saving..." : (step === TOTAL_STEPS || (step === 5 && accountPurpose === "experience")) ? "Finish" : <>Next <ArrowRight className="h-4 w-4" /></>}
               </Button>
             </div>
           </CardContent>

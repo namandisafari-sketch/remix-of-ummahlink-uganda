@@ -12,6 +12,17 @@ import { toast } from "sonner";
 import { LogIn, UserPlus, Check, ArrowLeft, ArrowRight, ShieldCheck, ShieldAlert } from "lucide-react";
 import logo from "@/assets/logo.svg";
 import { AddressPicker, emptyAddress, type AddressValue } from "@/components/AddressPicker";
+import { lovable } from "@/integrations/lovable";
+
+// Strict email: standard local@domain.tld, no spaces, valid TLD chars
+const EMAIL_RE = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+// Strict Uganda phone — accepts +2567XXXXXXXX, 2567XXXXXXXX, or 07XXXXXXXX (mobile only: 7)
+const UG_PHONE_RE = /^(?:\+?256|0)?7\d{8}$/;
+const normalizeUgPhone = (raw: string) => {
+  const digits = raw.replace(/[^\d+]/g, "");
+  const m = digits.match(/^(?:\+?256|0)?(7\d{8})$/);
+  return m ? `+256${m[1]}` : null;
+};
 
 const INTERESTS = [
   "Daily reminders", "Live lectures", "Quran tafsir", "Charity & sadaqah",
@@ -62,17 +73,37 @@ const AuthPage = () => {
   };
 
   const canProceed = () => {
-    if (step === 1) return displayName.trim().length >= 2 && phone.trim().length >= 7 && /^\S+@\S+\.\S+$/.test(email);
+    if (step === 1) return displayName.trim().length >= 2 && UG_PHONE_RE.test(phone.trim()) && EMAIL_RE.test(email.trim());
     if (step === 2) return !!address.region && !!address.district && !!address.constituency && !!address.subcounty && !!address.parish;
     if (step === 3) return pwValid && password === confirmPassword;
     return true;
   };
 
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleGoogle = async () => {
     setLoading(true);
     try {
-      await signIn(email, password);
+      const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
+      if (result.error) {
+        toast.error(result.error.message || "Google sign-in failed");
+        setLoading(false);
+        return;
+      }
+      // result.redirected handled by browser navigation; OnboardingGate enforces address step
+    } catch (err: any) {
+      toast.error(err?.message || "Google sign-in failed");
+      setLoading(false);
+    }
+  };
+
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!EMAIL_RE.test(email.trim())) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+    setLoading(true);
+    try {
+      await signIn(email.trim(), password);
       toast.success("Welcome back!");
       navigate("/");
     } catch (err: any) {
@@ -83,13 +114,18 @@ const AuthPage = () => {
   };
 
   const handleSignUp = async () => {
+    const normalizedPhone = normalizeUgPhone(phone);
+    if (!normalizedPhone) {
+      toast.error("Enter a valid Ugandan phone number, e.g. +256 7XX XXX XXX");
+      return;
+    }
     setLoading(true);
     try {
-      await signUp(email, password, displayName);
+      await signUp(email.trim(), password, displayName);
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         await supabase.from("profiles").upsert(
-          { user_id: user.id, display_name: displayName.trim(), phone: phone.trim() || null },
+          { user_id: user.id, display_name: displayName.trim(), phone: normalizedPhone },
           { onConflict: "user_id" }
         );
         await supabase.from("user_preferences").upsert(
@@ -200,6 +236,26 @@ const AuthPage = () => {
 
 
           <CardContent>
+            {(mode === "signin" || step === 1) && (
+              <div className="mb-4 space-y-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full gap-2"
+                  onClick={handleGoogle}
+                  disabled={loading}
+                >
+                  <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="#EA4335" d="M12 10.2v3.96h5.52c-.24 1.44-1.68 4.2-5.52 4.2-3.36 0-6.12-2.76-6.12-6.36S8.64 5.64 12 5.64c1.92 0 3.24.84 3.96 1.56l2.7-2.64C16.92 2.88 14.64 1.8 12 1.8 6.6 1.8 2.16 6.24 2.16 12S6.6 22.2 12 22.2c6.96 0 9.84-4.92 9.84-7.44 0-.48-.06-.84-.12-1.2H12z"/>
+                  </svg>
+                  Continue with Google
+                </Button>
+                <div className="relative text-center">
+                  <span className="bg-card relative z-10 px-2 text-xs text-muted-foreground">or use email</span>
+                  <span className="absolute left-0 right-0 top-1/2 h-px bg-border" />
+                </div>
+              </div>
+            )}
             {mode === "signin" ? (
               <form onSubmit={handleSignIn} className="space-y-3">
                 <div>
@@ -247,21 +303,29 @@ const AuthPage = () => {
                           <Input
                             id="phone"
                             type="tel"
+                            inputMode="tel"
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
                             placeholder="+256 7XX XXX XXX" className="placeholder-elegant"
                             maxLength={20}
                           />
+                          {phone && !UG_PHONE_RE.test(phone.trim()) && (
+                            <p className="mt-1 text-xs text-destructive">Use a valid Uganda mobile number, e.g. +256 7XX XXX XXX</p>
+                          )}
                         </div>
                         <div>
                           <Label htmlFor="email">Email</Label>
                           <Input
                             id="email"
                             type="email"
+                            inputMode="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="you@example.com" className="placeholder-elegant"
                           />
+                          {email && !EMAIL_RE.test(email.trim()) && (
+                            <p className="mt-1 text-xs text-destructive">Enter a valid email like name@example.com</p>
+                          )}
                         </div>
                       </>
                     )}
