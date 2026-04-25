@@ -275,6 +275,68 @@ const AdminResources = () => {
         </CardContent>
       </Card>
 
+      {/* Add direct audio link */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="mb-3 flex items-center gap-2">
+            <Headphones className="h-5 w-5 text-primary" />
+            <h3 className="font-semibold">Add audio link (plays in-app)</h3>
+          </div>
+          <p className="mb-3 text-xs text-muted-foreground">
+            Paste a direct audio URL (e.g. <code>.mp3</code> from{" "}
+            <a href="https://the-quran-project.github.io" target="_blank" rel="noreferrer" className="underline">
+              the-quran-project
+            </a>
+            ). Listeners will play it inside the app.
+          </p>
+          <div className="space-y-3">
+            <Input
+              value={audioUrl}
+              onChange={(e) => setAudioUrl(e.target.value)}
+              placeholder="https://the-quran-project.github.io/Quran-Audio/Data/1/2_242.mp3"
+            />
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <Label className="text-xs">Title</Label>
+                <Input value={audioTitle} onChange={(e) => setAudioTitle(e.target.value)} placeholder="Surah Al-Baqarah — Ayah 242" />
+              </div>
+              <div>
+                <Label className="text-xs">Reciter / Author</Label>
+                <Input value={audioAuthor} onChange={(e) => setAudioAuthor(e.target.value)} placeholder="Quran PathWay" />
+              </div>
+              <div>
+                <Label className="text-xs">Category</Label>
+                <Select value={audioCategory} onValueChange={setAudioCategory}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {QURAN_CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <Button onClick={handleAddAudio} disabled={audioSaving || !audioUrl.trim() || !audioTitle.trim()} className="gap-2">
+              {audioSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+              Add audio
+            </Button>
+
+            <div className="border-t pt-3">
+              <Label className="text-xs">Bulk add (one per line — "Title || URL" or just URL)</Label>
+              <textarea
+                value={bulkAudio}
+                onChange={(e) => setBulkAudio(e.target.value)}
+                rows={5}
+                className="mt-1 w-full rounded-md border border-input bg-background p-2 text-sm font-mono"
+                placeholder={"Surah Al-Baqarah 242 || https://.../2_242.mp3"}
+              />
+              <Button onClick={handleBulkAudio} disabled={bulkSaving || !bulkAudio.trim()} className="mt-2 gap-2" variant="outline">
+                {bulkSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                Bulk add
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* All resources list */}
       <div>
         <p className="mb-3 text-sm text-muted-foreground">{data?.length ?? 0} resources in the library.</p>
