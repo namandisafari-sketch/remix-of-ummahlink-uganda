@@ -504,6 +504,7 @@ export type Database = {
           file_path: string | null
           file_size: string | null
           id: string
+          reciter_scope: string | null
           thumbnail_url: string | null
           title: string
           type: string
@@ -520,6 +521,7 @@ export type Database = {
           file_path?: string | null
           file_size?: string | null
           id?: string
+          reciter_scope?: string | null
           thumbnail_url?: string | null
           title: string
           type: string
@@ -536,6 +538,7 @@ export type Database = {
           file_path?: string | null
           file_size?: string | null
           id?: string
+          reciter_scope?: string | null
           thumbnail_url?: string | null
           title?: string
           type?: string
