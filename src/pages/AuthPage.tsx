@@ -11,13 +11,14 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { LogIn, UserPlus, Check, ArrowLeft, ArrowRight, ShieldCheck, ShieldAlert } from "lucide-react";
 import logo from "@/assets/logo.svg";
+import { AddressPicker, type AddressValue } from "@/components/AddressPicker";
 
 const INTERESTS = [
   "Daily reminders", "Live lectures", "Quran tafsir", "Charity & sadaqah",
   "Mosque events", "Halal businesses", "Education", "Family & parenting",
 ];
 
-const TOTAL_STEPS = 3;
+const TOTAL_STEPS = 4;
 
 const scorePassword = (pw: string) => {
   let score = 0;
@@ -42,6 +43,12 @@ const AuthPage = () => {
   const [phone, setPhone] = useState("");
   const [city, setCity] = useState("");
   const [preferredMosque, setPreferredMosque] = useState("");
+  const [address, setAddress] = useState<AddressValue>({
+    region: "",
+    district: "",
+    constituency: "",
+    street: "",
+  });
   const [interests, setInterests] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const { signIn, signUp } = useAuth();
@@ -61,7 +68,8 @@ const AuthPage = () => {
 
   const canProceed = () => {
     if (step === 1) return displayName.trim().length >= 2 && phone.trim().length >= 7 && /^\S+@\S+\.\S+$/.test(email);
-    if (step === 2) return pwValid && password === confirmPassword;
+    if (step === 2) return !!address.region && !!address.district && !!address.constituency;
+    if (step === 3) return pwValid && password === confirmPassword;
     return true;
   };
 
@@ -92,7 +100,11 @@ const AuthPage = () => {
         await supabase.from("user_preferences").upsert(
           {
             user_id: user.id,
-            location_city: city.trim() || null,
+            location_city: city.trim() || address.district || null,
+            region: address.region || null,
+            district: address.district || null,
+            constituency: address.constituency || null,
+            street_address: address.street.trim() || null,
             interests,
             business_description: preferredMosque.trim() ? `Preferred mosque: ${preferredMosque.trim()}` : null,
           },
@@ -116,8 +128,9 @@ const AuthPage = () => {
 
   const stepMeta = [
     { n: 1, label: "Identity" },
-    { n: 2, label: "Security" },
-    { n: 3, label: "Interests" },
+    { n: 2, label: "Address" },
+    { n: 3, label: "Security" },
+    { n: 4, label: "Interests" },
   ];
 
   return (
@@ -133,6 +146,8 @@ const AuthPage = () => {
                 : step === 1
                 ? "Join UmmahLink"
                 : step === 2
+                ? "Your full address"
+                : step === 3
                 ? "Secure your account"
                 : "Personalize"}
             </CardTitle>
@@ -142,6 +157,8 @@ const AuthPage = () => {
                 : step === 1
                 ? "Tell us who you are"
                 : step === 2
+                ? "Region, district & constituency in Uganda"
+                : step === 3
                 ? "Choose a strong password"
                 : "Help us tailor your experience"}
             </CardDescription>
@@ -253,6 +270,10 @@ const AuthPage = () => {
                     )}
 
                     {step === 2 && (
+                      <AddressPicker value={address} onChange={setAddress} />
+                    )}
+
+                    {step === 3 && (
                       <>
                         <div>
                           <Label htmlFor="password">Password</Label>
@@ -315,7 +336,7 @@ const AuthPage = () => {
                       </>
                     )}
 
-                    {step === 3 && (
+                    {step === 4 && (
                       <>
                         <div className="grid grid-cols-2 gap-3">
                           <div>

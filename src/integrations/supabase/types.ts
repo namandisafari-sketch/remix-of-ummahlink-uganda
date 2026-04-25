@@ -580,7 +580,9 @@ export type Database = {
           business_category: string | null
           business_description: string | null
           business_name: string | null
+          constituency: string | null
           created_at: string
+          district: string | null
           has_business: boolean
           hobbies: string[] | null
           id: string
@@ -589,6 +591,8 @@ export type Database = {
           onboarding_completed: boolean
           onboarding_completed_at: string | null
           referral_source: string | null
+          region: string | null
+          street_address: string | null
           updated_at: string
           user_id: string
         }
@@ -598,7 +602,9 @@ export type Database = {
           business_category?: string | null
           business_description?: string | null
           business_name?: string | null
+          constituency?: string | null
           created_at?: string
+          district?: string | null
           has_business?: boolean
           hobbies?: string[] | null
           id?: string
@@ -607,6 +613,8 @@ export type Database = {
           onboarding_completed?: boolean
           onboarding_completed_at?: string | null
           referral_source?: string | null
+          region?: string | null
+          street_address?: string | null
           updated_at?: string
           user_id: string
         }
@@ -616,7 +624,9 @@ export type Database = {
           business_category?: string | null
           business_description?: string | null
           business_name?: string | null
+          constituency?: string | null
           created_at?: string
+          district?: string | null
           has_business?: boolean
           hobbies?: string[] | null
           id?: string
@@ -625,6 +635,8 @@ export type Database = {
           onboarding_completed?: boolean
           onboarding_completed_at?: string | null
           referral_source?: string | null
+          region?: string | null
+          street_address?: string | null
           updated_at?: string
           user_id?: string
         }
