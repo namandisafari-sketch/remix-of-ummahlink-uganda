@@ -83,6 +83,107 @@ export type Database = {
         }
         Relationships: []
       }
+      community_aid_posts: {
+        Row: {
+          category: string
+          constituency: string | null
+          contact_phone: string | null
+          created_at: string
+          description: string | null
+          district: string | null
+          expires_at: string | null
+          id: string
+          kind: string
+          parish: string | null
+          region: string | null
+          scope: string
+          status: string
+          subcounty: string | null
+          title: string
+          updated_at: string
+          urgent: boolean
+          user_id: string
+          village: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          category?: string
+          constituency?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          district?: string | null
+          expires_at?: string | null
+          id?: string
+          kind?: string
+          parish?: string | null
+          region?: string | null
+          scope?: string
+          status?: string
+          subcounty?: string | null
+          title: string
+          updated_at?: string
+          urgent?: boolean
+          user_id: string
+          village?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          category?: string
+          constituency?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          district?: string | null
+          expires_at?: string | null
+          id?: string
+          kind?: string
+          parish?: string | null
+          region?: string | null
+          scope?: string
+          status?: string
+          subcounty?: string | null
+          title?: string
+          updated_at?: string
+          urgent?: boolean
+          user_id?: string
+          village?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      community_aid_responses: {
+        Row: {
+          created_at: string
+          id: string
+          message: string | null
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_aid_responses_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_aid_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       donations: {
         Row: {
           amount: number
@@ -316,6 +417,72 @@ export type Database = {
           verified?: boolean
           village?: string | null
           whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      lost_found_items: {
+        Row: {
+          category: string | null
+          constituency: string | null
+          contact_phone: string | null
+          created_at: string
+          description: string | null
+          district: string | null
+          id: string
+          image_url: string | null
+          kind: string
+          location_text: string | null
+          occurred_at: string | null
+          parish: string | null
+          region: string | null
+          status: string
+          subcounty: string | null
+          title: string
+          updated_at: string
+          user_id: string
+          village: string | null
+        }
+        Insert: {
+          category?: string | null
+          constituency?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          district?: string | null
+          id?: string
+          image_url?: string | null
+          kind?: string
+          location_text?: string | null
+          occurred_at?: string | null
+          parish?: string | null
+          region?: string | null
+          status?: string
+          subcounty?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+          village?: string | null
+        }
+        Update: {
+          category?: string | null
+          constituency?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          district?: string | null
+          id?: string
+          image_url?: string | null
+          kind?: string
+          location_text?: string | null
+          occurred_at?: string | null
+          parish?: string | null
+          region?: string | null
+          status?: string
+          subcounty?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+          village?: string | null
         }
         Relationships: []
       }
@@ -938,6 +1105,69 @@ export type Database = {
           title?: string | null
           updated_at?: string
           verified?: boolean
+        }
+        Relationships: []
+      }
+      skill_listings: {
+        Row: {
+          active: boolean
+          category: string
+          constituency: string | null
+          contact_phone: string | null
+          created_at: string
+          description: string | null
+          district: string | null
+          id: string
+          image_url: string | null
+          parish: string | null
+          price_text: string | null
+          region: string | null
+          subcounty: string | null
+          title: string
+          updated_at: string
+          user_id: string
+          village: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          active?: boolean
+          category?: string
+          constituency?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          district?: string | null
+          id?: string
+          image_url?: string | null
+          parish?: string | null
+          price_text?: string | null
+          region?: string | null
+          subcounty?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+          village?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          active?: boolean
+          category?: string
+          constituency?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          district?: string | null
+          id?: string
+          image_url?: string | null
+          parish?: string | null
+          price_text?: string | null
+          region?: string | null
+          subcounty?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+          village?: string | null
+          whatsapp?: string | null
         }
         Relationships: []
       }
