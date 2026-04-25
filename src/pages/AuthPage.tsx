@@ -60,7 +60,7 @@ const AuthPage = () => {
   };
 
   const canProceed = () => {
-    if (step === 1) return displayName.trim().length >= 2 && /^\S+@\S+\.\S+$/.test(email);
+    if (step === 1) return displayName.trim().length >= 2 && phone.trim().length >= 7 && /^\S+@\S+\.\S+$/.test(email);
     if (step === 2) return pwValid && password === confirmPassword;
     return true;
   };
@@ -125,9 +125,8 @@ const AuthPage = () => {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
         <Card className="border-border/60 shadow-xl">
           <CardHeader className="text-center">
-            <div className="mx-auto mb-3 flex h-28 w-28 items-center justify-center rounded-2xl bg-primary/5 ring-1 ring-primary/10">
-              <img src={logo} alt="UmmahLink" className="h-24 w-24 rounded-2xl" />
-            </div>
+            <img src={logo} alt="UmmahLink" className="mx-auto mb-3 h-24 w-24 bg-transparent" />
+
             <CardTitle className="font-display text-2xl">
               {mode === "signin"
                 ? "Welcome Back"
@@ -230,7 +229,7 @@ const AuthPage = () => {
                           />
                         </div>
                         <div>
-                          <Label htmlFor="phone">Phone number (optional)</Label>
+                          <Label htmlFor="phone">Phone number</Label>
                           <Input
                             id="phone"
                             type="tel"
