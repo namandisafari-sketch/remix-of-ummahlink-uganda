@@ -53,6 +53,9 @@ const ResourcesPage = () => {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
+  const [activeFormat, setActiveFormat] = useState<"all" | "audio" | "video" | "text">("all");
+  const [activeScope, setActiveScope] = useState<"all" | "local" | "international">("all");
+  const [activeReciter, setActiveReciter] = useState<string>("all");
   const [showUpload, setShowUpload] = useState(false);
 
   // Upload state
