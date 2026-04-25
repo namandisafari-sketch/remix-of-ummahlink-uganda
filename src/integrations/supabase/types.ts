@@ -598,6 +598,241 @@ export type Database = {
         }
         Relationships: []
       }
+      tour_inquiries: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          message: string | null
+          name: string
+          operator_id: string
+          package_id: string | null
+          phone: string
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          message?: string | null
+          name: string
+          operator_id: string
+          package_id?: string | null
+          phone: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          message?: string | null
+          name?: string
+          operator_id?: string
+          package_id?: string | null
+          phone?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_inquiries_operator_id_fkey"
+            columns: ["operator_id"]
+            isOneToOne: false
+            referencedRelation: "tour_operators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_inquiries_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "tour_packages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tour_operators: {
+        Row: {
+          active: boolean
+          bio: string | null
+          city: string | null
+          contact_phone: string | null
+          country: string | null
+          created_at: string
+          district: string | null
+          email: string | null
+          hero_url: string | null
+          id: string
+          license_authority: string | null
+          license_no: string | null
+          logo_url: string | null
+          name: string
+          owner_user_id: string
+          slug: string
+          updated_at: string
+          verified: boolean
+          website: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          active?: boolean
+          bio?: string | null
+          city?: string | null
+          contact_phone?: string | null
+          country?: string | null
+          created_at?: string
+          district?: string | null
+          email?: string | null
+          hero_url?: string | null
+          id?: string
+          license_authority?: string | null
+          license_no?: string | null
+          logo_url?: string | null
+          name: string
+          owner_user_id: string
+          slug: string
+          updated_at?: string
+          verified?: boolean
+          website?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          active?: boolean
+          bio?: string | null
+          city?: string | null
+          contact_phone?: string | null
+          country?: string | null
+          created_at?: string
+          district?: string | null
+          email?: string | null
+          hero_url?: string | null
+          id?: string
+          license_authority?: string | null
+          license_no?: string | null
+          logo_url?: string | null
+          name?: string
+          owner_user_id?: string
+          slug?: string
+          updated_at?: string
+          verified?: boolean
+          website?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      tour_packages: {
+        Row: {
+          active: boolean
+          created_at: string
+          departure_date: string | null
+          departure_month: string | null
+          description: string | null
+          duration_days: number | null
+          hotel_madinah: string | null
+          hotel_makkah: string | null
+          id: string
+          image_url: string | null
+          includes: string[] | null
+          name: string
+          operator_id: string
+          price_ugx: number
+          seats_available: number | null
+          tier: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          departure_date?: string | null
+          departure_month?: string | null
+          description?: string | null
+          duration_days?: number | null
+          hotel_madinah?: string | null
+          hotel_makkah?: string | null
+          id?: string
+          image_url?: string | null
+          includes?: string[] | null
+          name: string
+          operator_id: string
+          price_ugx?: number
+          seats_available?: number | null
+          tier?: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          departure_date?: string | null
+          departure_month?: string | null
+          description?: string | null
+          duration_days?: number | null
+          hotel_madinah?: string | null
+          hotel_makkah?: string | null
+          id?: string
+          image_url?: string | null
+          includes?: string[] | null
+          name?: string
+          operator_id?: string
+          price_ugx?: number
+          seats_available?: number | null
+          tier?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_packages_operator_id_fkey"
+            columns: ["operator_id"]
+            isOneToOne: false
+            referencedRelation: "tour_operators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tour_reviews: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          operator_id: string
+          rating: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          operator_id: string
+          rating: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          operator_id?: string
+          rating?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_reviews_operator_id_fkey"
+            columns: ["operator_id"]
+            isOneToOne: false
+            referencedRelation: "tour_operators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tv_content: {
         Row: {
           active: boolean
@@ -763,7 +998,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "moderator" | "user"
+      app_role: "admin" | "moderator" | "user" | "operator"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -891,7 +1126,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "moderator", "user"],
+      app_role: ["admin", "moderator", "user", "operator"],
     },
   },
 } as const
