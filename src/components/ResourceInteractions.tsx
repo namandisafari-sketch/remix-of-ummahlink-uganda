@@ -23,6 +23,15 @@ interface Props {
   resourceId: string;
 }
 
+const resolveName = (name: string | null | undefined, userId: string): string => {
+  const trimmed = (name || "").trim();
+  if (trimmed) {
+    // If it's an email, show only the part before @
+    return trimmed.includes("@") ? trimmed.split("@")[0] : trimmed;
+  }
+  return `User ${userId.slice(0, 6)}`;
+};
+
 export const ResourceInteractions = ({ resourceId }: Props) => {
   const { user } = useAuth();
   const { isAdmin } = useIsAdmin();
@@ -60,7 +69,7 @@ export const ResourceInteractions = ({ resourceId }: Props) => {
       if (ids.length) {
         const { data: profs } = await supabase.from("profiles").select("user_id, display_name").in("user_id", ids);
         const map = new Map((profs || []).map((p: any) => [p.user_id, p.display_name]));
-        list.forEach((c) => (c.author_name = map.get(c.user_id) || "Anonymous"));
+        list.forEach((c) => (c.author_name = resolveName(map.get(c.user_id), c.user_id)));
       }
       if (!cancelled) setComments(list);
     })();
@@ -96,7 +105,7 @@ export const ResourceInteractions = ({ resourceId }: Props) => {
             .select("display_name")
             .eq("user_id", c.user_id)
             .maybeSingle();
-          c.author_name = prof?.display_name || "Anonymous";
+          c.author_name = resolveName(prof?.display_name, c.user_id);
           setComments((prev) => (prev.find((x) => x.id === c.id) ? prev : [c, ...prev]));
         }
       )
