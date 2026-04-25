@@ -45,6 +45,9 @@ const Shell = () => {
           <Route path="/dawah" element={<DawahPage />} />
           <Route path="/map" element={<MapPage />} />
           <Route path="/tv" element={<TvPage />} />
+          <Route path="/hajj-umrah" element={<HajjUmrahPage />} />
+          <Route path="/hajj-umrah/:slug" element={<TourOperatorPage />} />
+          <Route path="/operator" element={<OperatorDashboard />} />
           <Route path="/more" element={<MorePage />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/onboarding" element={<OnboardingPage />} />
