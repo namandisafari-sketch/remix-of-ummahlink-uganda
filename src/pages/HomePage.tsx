@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import HeroBanner from "@/components/HeroBanner";
 import HomeUrgentBanner from "@/components/notifications/HomeUrgentBanner";
 import CommunityHelpCard from "@/components/community/CommunityHelpCard";
+import DailyIslamicCard from "@/components/daily/DailyIslamicCard";
 import { useAuth } from "@/contexts/AuthContext";
 
 const quickActions = [
@@ -91,6 +92,9 @@ const HomePage = () => {
       <div className="mt-3 md:mt-0">
         <HeroBanner />
       </div>
+
+      {/* Live Daily Islamic data: prayer times + Hijri + verse */}
+      <DailyIslamicCard />
 
       {/* Quick Actions — app-style icon grid */}
       <section className="-mt-2 px-4 md:px-6">
