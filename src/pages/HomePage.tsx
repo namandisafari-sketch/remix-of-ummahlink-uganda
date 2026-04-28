@@ -5,6 +5,7 @@ import HeroBanner from "@/components/HeroBanner";
 import HomeUrgentBanner from "@/components/notifications/HomeUrgentBanner";
 import CommunityHelpCard from "@/components/community/CommunityHelpCard";
 import DailyIslamicCard from "@/components/daily/DailyIslamicCard";
+import MuslimChannelNewsCard from "@/components/news/MuslimChannelNewsCard";
 import { useAuth } from "@/contexts/AuthContext";
 
 const quickActions = [
@@ -213,6 +214,9 @@ const HomePage = () => {
           })}
         </div>
       </section>
+
+      {/* Live news from Muslim Channel Uganda */}
+      <MuslimChannelNewsCard />
 
       {/* Community Help (Mutual Aid / Lost & Found / Skills) */}
       <CommunityHelpCard />
